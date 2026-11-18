@@ -1,0 +1,169 @@
+/* ComandaYa · css/estilos.css (no cambia durante la guía) */
+:root {
+  --tomate: #c2410c;
+  --tomate-claro: #fff1e6;
+  --mostaza: #f2b705;
+  --carbon: #2b1d14;
+  --cafe: #7a5a44;
+  --papel: #fffaf4;
+  --linea: #f0d9c4;
+  --verde: #2f7d32;
+  --rojo: #b3261e;
+}
+
+* { box-sizing: border-box; }
+ 
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: system-ui, sans-serif;
+  background: var(--papel);
+  color: var(--carbon);
+}
+
+main { max-width: 760px; margin: 0 auto; display: grid; gap: 16px; }
+.top h1 { margin: 0; color: var(--tomate); font-size: 26px; }
+.top p { margin: 10px 0px 0px; color: var(--cafe); font-size: 14px; }
+
+.panel {
+  background: #fff;
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.panel h2 { margin: 0; font-size: 16px; }
+
+/* Formularios */
+form {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  align-items: end;
+}
+
+label { display: grid; gap: 4px; font-size: 12px; font-weight: 700; color: var(--cafe); }
+
+input, select {
+  padding: 8px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 10px;
+  background: #fff;
+  color: var(--carbon);
+  min-width: 0;
+}
+
+button {
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  background: var(--tomate);
+  color: #fff;
+  transition: transform .15s, filter .15s;
+}
+
+button:hover { filter: brightness(1.1); }
+button:active { transform: scale(.95); }
+button.suave { background: var(--tomate-claro); color: var(--tomate); }
+form.editando button[type="submit"] { background: var(--verde); }
+
+/* Mensajes: flotan arriba y se animan */
+#toast {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  justify-self: center;
+  background: #fff;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(43, 29, 20, .12);
+}
+#toast:empty { display: none; }
+#toast.ok { color: var(--verde); animation: entrar .3s; }
+#toast.error { color: var(--rojo); border-color: var(--rojo); animation: sacudir .4s; }
+
+/* Tarjetas del menú */
+.grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+.vacio { color: var(--cafe); font-size: 14px; margin: 0; }
+.tarjeta {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  padding: 10px;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.tarjeta:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(194, 65, 12, .15); }
+.tarjeta .ico { font-size: 28px; text-align: center; display: inline-block; }
+.tarjeta:hover .ico { animation: girar .6s; }
+.tarjeta b { display: block; font-size: 14px; }
+.tarjeta small { display: block; color: var(--cafe); font-size: 12px; }
+.tarjeta .precio { font-weight: 800; color: var(--tomate); }
+.tarjeta .acciones { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.tarjeta .acciones button { padding: 6px 10px; font-size: 12px; }
+
+/* Tablero de comandas */
+.tablero { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.columna {
+  background: var(--tomate-claro);
+  border-radius: 10px;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-height: 90px;
+}
+
+.columna h3 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--tomate); }
+.columna:nth-child(2) h3::after { content: " 🍳"; display: inline-block; animation: cocinar .8s infinite; }
+.orden {
+  background: #fff;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 13px;
+  display: grid;
+  gap: 4px;
+  cursor: pointer;
+}
+.orden.activa { border-color: var(--mostaza); }
+.orden ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.orden li { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+.orden .quitar { background: none; color: var(--rojo); padding: 0 4px; }
+.orden .pie { display: flex; justify-content: space-between; font-weight: 800; }
+.orden .botones { display: flex; gap: 4px; }
+.orden .botones button { padding: 5px 8px; font-size: 12px; flex: 1; }
+.ventas { margin: 0; font-weight: 700; text-align: right; }
+.ventas b { color: var(--verde); font-size: 18px; }
+ 
+/* Animaciones (las clases las pone JavaScript) */
+.entra { animation: entrar .45s cubic-bezier(.2, 1.4, .4, 1); }
+.brilla { animation: brillar .9s; }
+.sale { animation: salir .3s forwards; }
+.llega { animation: llegar .4s ease-out; }
+@keyframes entrar { from { opacity: 0; transform: translateY(14px) scale(.9); } }
+@keyframes brillar { 30% { background: #fff3c4; box-shadow: 0 0 0 3px var(--mostaza); } }
+@keyframes salir { to { opacity: 0; transform: scale(.6); } }
+@keyframes llegar { from { opacity: 0; transform: translateX(-40px); } }
+@keyframes sacudir { 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
+@keyframes girar { 50% { transform: rotate(-15deg) scale(1.2); } }
+@keyframes cocinar { 50% { transform: translateY(-3px) rotate(10deg); } }
+ 
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

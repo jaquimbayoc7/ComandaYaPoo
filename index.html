@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comanda Ya</title>
+    <link rel="stylesheet" href="css/estilos.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>🍔 Comanda Ya</h1>
+        <p>Menú y comandas del restaurante</p>
+      </header>
+      <div id="toast" role="status"></div>
+      <section class="panel">
+        <h2>Nuevo Plato 🍽️</h2>
+        <form id="formulario">
+          <label>
+            Tipo:
+            <select id="tipo">
+              <option>Hamburguesa</option>
+              <option>Pizza</option>
+              <option>Bebida</option>
+            </select>
+          </label>
+          <label>
+            Nombre:
+            <input
+              type="text"
+              id="nombre"
+              required
+              placeholder="Ingrese el nombre de la persona para el pedido"
+            />
+          </label>
+          <label>
+            Precio:
+            <input
+              type="number"
+              id="precio"
+              required
+              placeholder="Ingrese el precio del plato"
+              step="100"
+            />
+          </label>
+          <button type="submit" id="guardar">Agregar al Menú</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Menú 🍽️</h2>
+        <div id="carta" class="grid"></div>
+      </section>
+    </main>
+
+    <script src="js/0-base.js"></script>
+  </body>
+</html>

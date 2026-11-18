@@ -1,0 +1,2760 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Guía ComandaYa POO</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: menú lateral con los pasos; a la derecha concepto, diagrama de clases, código por archivo con las líneas nuevas resaltadas, vista previa funcionando y punto de control. */
+:root {
+  --bg: #f4f7f1;
+  --surface: #ffffff;
+  --fg: #1b2418;
+  --muted: #536050;
+  --line: #d6dfcf;
+  --accent: #1e5f00;
+  --on-accent: #ffffff;
+  --accent-soft: #e6f3de;
+  --brand: #39a900;
+  --bad: #b3261e;
+  --bad-soft: #fbe9e7;
+  --warn: #9a4400;
+  --code-bg: #14210f;
+  --code-fg: #e3eedb;
+  --code-dim: #8fa586;
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', sans-serif;
+  --font-body: 'Nunito Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e150c; --surface: #162112; --fg: #e5eee0; --muted: #9db093;
+    --line: #2a3a25; --accent: #6fd62a; --on-accent: #0e150c; --accent-soft: #1d2d17;
+    --brand: #6fd62a; --bad: #ff9a90; --bad-soft: #3a1c19; --warn: #ffa968;
+    --code-bg: #0a1008; --code-fg: #dfead8; --code-dim: #7f9576;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e150c; --surface: #162112; --fg: #e5eee0; --muted: #9db093;
+  --line: #2a3a25; --accent: #6fd62a; --on-accent: #0e150c; --accent-soft: #1d2d17;
+  --brand: #6fd62a; --bad: #ff9a90; --bad-soft: #3a1c19; --warn: #ffa968;
+  --code-bg: #0a1008; --code-fg: #dfead8; --code-dim: #7f9576;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 26px 56px;
+}
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 26px; font-weight: 700; }
+h3 { font: 700 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+p { margin: 0; }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; }
+pre code { background: none; padding: 0; border-radius: 0; font-size: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.kicker { font: 600 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+
+.top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 280px); gap: 20px; align-items: end; }
+@media (max-width: 720px) { .top { grid-template-columns: minmax(0, 1fr); } }
+.top p { color: var(--muted); max-width: 70ch; margin-top: 8px; }
+.progress { display: grid; gap: 6px; }
+.progress b { font: 700 13px var(--font-mono); }
+.bar { height: 10px; border-radius: 999px; background: var(--accent-soft); border: 1.5px solid var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--brand); width: 0; transition: width .4s; }
+
+.layout { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+nav#nav { display: grid; gap: 6px; position: sticky; top: 10px; }
+@media (max-width: 900px) { nav#nav { position: static; display: flex; overflow-x: auto; padding-bottom: 6px; } }
+.navitem {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: center; text-align: left;
+  font: 600 13.5px var(--font-body); color: var(--fg); background: var(--surface);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; cursor: pointer;
+}
+@media (max-width: 900px) { .navitem { flex: 0 0 auto; } .navitem .nt small { display: none; } }
+.navitem:hover { border-color: var(--accent); }
+.navitem[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.navitem .n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--font-mono); background: var(--line); color: var(--fg); }
+.navitem.done .n { background: var(--accent); color: var(--on-accent); }
+.navitem .nt { min-width: 0; line-height: 1.25; display: grid; }
+.navitem .nt small { font: 600 10.5px var(--font-mono); letter-spacing: .04em; color: var(--muted); text-transform: uppercase; }
+
+.step { display: grid; gap: 18px; min-width: 0; animation: aparecer .35s ease-out; }
+@keyframes aparecer { from { opacity: 0; transform: translateY(8px); } }
+.exhead { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.exhead .num { font: 600 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.tag { font: 700 11px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; border: 1.5px solid var(--accent); color: var(--accent); }
+.state { margin-left: auto; font: 700 12px var(--font-mono); color: var(--muted); }
+.state.ok { color: var(--accent); }
+.card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 16px 18px; display: grid; gap: 10px; min-width: 0; align-content: start; }
+.concept { border-color: var(--accent); background: var(--accent-soft); }
+.concept b { color: var(--accent); }
+ol.todo { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+ol.todo li::marker { font-weight: 700; color: var(--accent); }
+.note { color: var(--muted); font-size: 14px; }
+ul.req { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+ul.req li::marker { color: var(--accent); }
+.gitcard { border-color: var(--brand); border-left-width: 6px; }
+
+.codehead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.legend { font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; background: rgba(143, 224, 74, .35); border-left: 3px solid #8fe04a; display: inline-block; }
+.codewrap { background: var(--code-bg); border-radius: 10px; overflow: hidden; min-width: 0; }
+.codewrap .cap { font: 600 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--code-dim); padding: 9px 14px 0; }
+pre { margin: 0; padding: 8px 14px 14px; overflow-x: auto; color: var(--code-fg); font: 400 12.5px/1.65 var(--font-mono); max-height: 620px; overflow-y: auto; }
+pre .l { display: block; padding: 0 14px; margin: 0 -14px; white-space: pre; }
+pre .l.n { background: rgba(143, 224, 74, .16); box-shadow: inset 3px 0 0 #8fe04a; }
+pre .l.hit { background: rgba(255, 200, 60, .30); box-shadow: inset 3px 0 0 #ffc83c; transition: background .3s; }
+details.fold { border: 1.5px dashed var(--line); border-radius: 10px; background: var(--surface); }
+details.fold > summary { cursor: pointer; padding: 9px 14px; font: 600 13px var(--font-mono); color: var(--muted); }
+details.fold > .codewrap, details.fold > .inner { margin: 0 10px 10px; }
+.inner { display: grid; gap: 12px; min-width: 0; }
+
+/* Pestañas de archivos */
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: -12px; }
+.tab { font: 600 12px var(--font-mono); padding: 7px 12px; border-radius: 8px 8px 0 0; border: 1.5px solid var(--line); border-bottom: 0; background: var(--surface); color: var(--muted); cursor: pointer; }
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"] { background: var(--code-bg); color: var(--code-fg); border-color: var(--code-bg); }
+.tab .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #8fe04a; margin-left: 7px; vertical-align: middle; }
+.tabpanel > .codewrap, .tabpanel > details { border-top-left-radius: 0; }
+
+button.act {
+  font: 700 13.5px var(--font-body); border-radius: 8px; border: 1.5px solid var(--line);
+  background: var(--surface); color: var(--fg); padding: 9px 14px; cursor: pointer; min-width: 0;
+  transition: transform .12s;
+}
+button.act:hover { border-color: var(--accent); background: var(--accent-soft); }
+button.act:active { transform: scale(.97); }
+button.act.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+button.act.primary:hover { filter: brightness(1.12); background: var(--accent); }
+button.act.mono { font-family: var(--font-mono); font-size: 12.5px; text-align: left; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.preview { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .preview { grid-template-columns: minmax(0, 1fr); } }
+.pv { border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; background: #fffaf4; min-width: 0; }
+.pv .bar2 { display: flex; gap: 6px; align-items: center; padding: 7px 12px; background: var(--surface); border-bottom: 1.5px solid var(--line); font: 600 11.5px var(--font-mono); color: var(--muted); }
+.pv .bar2 i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); display: inline-block; }
+.pv .host { min-height: 300px; max-height: 720px; overflow: auto; }
+.log { background: var(--bg); border: 1.5px dashed var(--line); border-radius: 10px; padding: 10px 12px; min-height: 90px; max-height: 300px; overflow: auto; font: 400 12.5px/1.55 var(--font-mono); display: grid; gap: 4px; align-content: start; }
+.log .empty { color: var(--muted); font-family: var(--font-body); font-size: 13.5px; }
+.log .ln { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; overflow-wrap: anywhere; animation: aparecer .25s; }
+.log .ln.ok .mk { color: var(--accent); }
+.log .ln.err, .log .ln.err .mk { color: var(--bad); }
+.log .src { color: var(--muted); }
+
+/* Diagrama de clases */
+.umlwrap { overflow-x: auto; border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg); padding: 6px; }
+.uml { width: 100%; min-width: 620px; height: auto; display: block; }
+.uml .box { fill: var(--surface); stroke: var(--fg); stroke-width: 1.4; }
+.uml .box.nuevo { stroke: var(--brand); stroke-width: 2.6; }
+.uml .head { fill: var(--accent-soft); }
+.uml .sep { stroke: var(--fg); stroke-width: 1; opacity: .6; }
+.uml text { fill: var(--fg); font-family: var(--font-mono); font-size: 10.5px; }
+.uml .cname { font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+.uml .abs { font-style: italic; }
+.uml .stereo { font-size: 9.5px; fill: var(--muted); }
+.uml .mnew { fill: rgba(143, 224, 74, .30); }
+.uml .rel { fill: none; stroke: var(--fg); stroke-width: 1.3; }
+.uml .mk-hollow { fill: var(--surface); stroke: var(--fg); stroke-width: 1.3; }
+.uml .mk-solid { fill: var(--fg); stroke: var(--fg); stroke-width: 1; }
+.uml .mult { font-size: 10px; fill: var(--muted); }
+.uml g.cls { cursor: pointer; outline: none; }
+.uml g.cls:hover .box, .uml g.cls:focus-visible .box { stroke: var(--accent); stroke-width: 2.6; }
+.uml g.cls.sel .box { stroke: var(--warn); stroke-width: 3; }
+.uml g.cls.nuevo { animation: umlpop .55s both; transform-box: fill-box; transform-origin: center; }
+@keyframes umlpop { from { opacity: 0; transform: scale(.85); } }
+.umllegend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); }
+.umllegend .lgnew { border-left: 3px solid #8fe04a; background: rgba(143, 224, 74, .2); padding: 0 6px; border-radius: 3px; }
+.umlinfo { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; background: var(--surface); }
+.umlinfo b { font-family: var(--font-display); font-size: 16px; }
+
+/* Commits */
+.chip { font: 700 12px var(--font-mono); padding: 2px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; border: 1.5px solid var(--accent); }
+.chip.fix { color: var(--bad); border-color: var(--bad); background: var(--bad-soft); }
+.chip.style, .chip.refactor, .chip.chore { color: var(--warn); border-color: var(--warn); background: transparent; }
+.chip.docs { color: var(--muted); border-color: var(--muted); background: transparent; }
+.commitrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.anat { font: 600 clamp(13px, 2.6vw, 16px) var(--font-mono); display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
+.anat > span { display: grid; gap: 2px; padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--bg); }
+.anat > span small { font: 600 10.5px var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.anat .t { border-color: var(--accent); }
+.anat .t b { color: var(--accent); }
+.tablewrap { overflow-x: auto; }
+table.tipos { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px; }
+table.tipos th, table.tipos td { text-align: left; padding: 8px; border-bottom: 1.5px solid var(--line); vertical-align: top; }
+table.tipos th { font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.compare > div { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; }
+.compare .mal { border-color: var(--bad); background: var(--bad-soft); }
+.compare .bien { border-color: var(--accent); background: var(--accent-soft); }
+.compare ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px; }
+.callout { border-left: 5px solid var(--warn); background: var(--surface); border-radius: 8px; padding: 10px 14px; }
+.quiz { display: grid; gap: 10px; }
+.qitem { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; }
+.qitem .opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.qitem .opts button { font: 700 12.5px var(--font-mono); padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.qitem .opts button:hover { border-color: var(--accent); }
+.qitem .opts button.ok { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.qitem .opts button.no { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); animation: sacudir .35s; }
+@keyframes sacudir { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.qfb { font-size: 13.5px; min-height: 1em; }
+.qscore { font: 700 14px var(--font-mono); color: var(--accent); }
+
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.checks label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-size: 14.5px; }
+.checks input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); flex: 0 0 auto; }
+details.think { border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); padding: 12px 16px; }
+details.think summary { cursor: pointer; font-weight: 700; }
+details.think p { margin-top: 8px; color: var(--muted); }
+.navbtns { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="kicker">SENA · ADSO · Proyecto ComandaYa</div>
+      <h1>Construye el sistema de comandas de un restaurante</h1>
+      <p>Vas a crear, paso a paso, una app web con <code>index.html</code>, <code>css/estilos.css</code> y un archivo JavaScript por cada pilar de la POO: abstracción, encapsulamiento, herencia y polimorfismo. Tendrá un CRUD completo de platos, un tablero de comandas y animaciones. Cada paso trae su diagrama de clases, el código con las líneas nuevas resaltadas, una vista previa que funciona y un commit en GitHub con un buen nombre. Escribe el código tú mismo; copia solo si te atascas.</p>
+    </div>
+    <div class="progress" aria-live="polite">
+      <b id="prog-txt">0 de 9 pasos</b>
+      <div class="bar"><i id="prog-bar"></i></div>
+    </div>
+  </div>
+  <div class="layout">
+    <nav id="nav" aria-label="Pasos"></nav>
+    <main id="main"></main>
+  </div>
+</div>
+
+<!-- ======================= ARCHIVOS DEL APRENDIZ ======================= -->
+<script type="text/plain" data-k="css">
+/* ComandaYa · css/estilos.css (no cambia durante la guía) */
+:root {
+  --tomate: #c2410c;
+  --tomate-claro: #fff1e6;
+  --mostaza: #f2b705;
+  --carbon: #2b1d14;
+  --cafe: #7a5a44;
+  --papel: #fffaf4;
+  --linea: #f0d9c4;
+  --verde: #2f7d32;
+  --rojo: #b3261e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: system-ui, sans-serif;
+  background: var(--papel);
+  color: var(--carbon);
+}
+
+main { max-width: 760px; margin: 0 auto; display: grid; gap: 16px; }
+.top h1 { margin: 0; color: var(--tomate); font-size: 26px; }
+.top p { margin: 2px 0 0; color: var(--cafe); font-size: 14px; }
+
+.panel {
+  background: #fff;
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+.panel h2 { margin: 0; font-size: 16px; }
+
+/* Formularios */
+form {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  align-items: end;
+}
+label { display: grid; gap: 4px; font-size: 12px; font-weight: 700; color: var(--cafe); }
+input, select {
+  padding: 8px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  background: #fff;
+  color: var(--carbon);
+  min-width: 0;
+}
+button {
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  background: var(--tomate);
+  color: #fff;
+  transition: transform .15s, filter .15s;
+}
+button:hover { filter: brightness(1.1); }
+button:active { transform: scale(.95); }
+button.suave { background: var(--tomate-claro); color: var(--tomate); }
+form.editando button[type="submit"] { background: var(--verde); }
+
+/* Mensajes: flotan arriba y se animan */
+#toast {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  justify-self: center;
+  background: #fff;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(43, 29, 20, .12);
+}
+#toast:empty { display: none; }
+#toast.ok { color: var(--verde); animation: entrar .3s; }
+#toast.error { color: var(--rojo); border-color: var(--rojo); animation: sacudir .4s; }
+
+/* Tarjetas del menú */
+.grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+.vacio { color: var(--cafe); font-size: 14px; margin: 0; }
+.tarjeta {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  padding: 10px;
+  transition: transform .2s, box-shadow .2s;
+}
+.tarjeta:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(194, 65, 12, .15); }
+.tarjeta .ico { font-size: 28px; text-align: center; display: inline-block; }
+.tarjeta:hover .ico { animation: girar .6s; }
+.tarjeta b { display: block; font-size: 14px; }
+.tarjeta small { display: block; color: var(--cafe); font-size: 12px; }
+.tarjeta .precio { font-weight: 800; color: var(--tomate); }
+.tarjeta .acciones { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.tarjeta .acciones button { padding: 6px 10px; font-size: 12px; }
+
+/* Tablero de comandas */
+.tablero { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.columna {
+  background: var(--tomate-claro);
+  border-radius: 10px;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-height: 90px;
+}
+.columna h3 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--tomate); }
+.columna:nth-child(2) h3::after { content: " 🍳"; display: inline-block; animation: cocinar .8s infinite; }
+.orden {
+  background: #fff;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 13px;
+  display: grid;
+  gap: 4px;
+  cursor: pointer;
+}
+.orden.activa { border-color: var(--mostaza); }
+.orden ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.orden li { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+.orden .quitar { background: none; color: var(--rojo); padding: 0 4px; }
+.orden .pie { display: flex; justify-content: space-between; font-weight: 800; }
+.orden .botones { display: flex; gap: 4px; }
+.orden .botones button { padding: 5px 8px; font-size: 12px; flex: 1; }
+.ventas { margin: 0; font-weight: 700; text-align: right; }
+.ventas b { color: var(--verde); font-size: 18px; }
+
+/* Animaciones (las clases las pone JavaScript) */
+.entra { animation: entrar .45s cubic-bezier(.2, 1.4, .4, 1); }
+.brilla { animation: brillar .9s; }
+.sale { animation: salir .3s forwards; }
+.llega { animation: llegar .4s ease-out; }
+@keyframes entrar { from { opacity: 0; transform: translateY(14px) scale(.9); } }
+@keyframes brillar { 30% { background: #fff3c4; box-shadow: 0 0 0 3px var(--mostaza); } }
+@keyframes salir { to { opacity: 0; transform: scale(.6); } }
+@keyframes llegar { from { opacity: 0; transform: translateX(-40px); } }
+@keyframes sacudir { 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
+@keyframes girar { 50% { transform: rotate(-15deg) scale(1.2); } }
+@keyframes cocinar { 50% { transform: translateY(-3px) rotate(10deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</script>
+
+<script type="text/plain" data-k="h0">
+  <main>
+    <header class="top">
+      <h1>🍔 ComandaYa</h1>
+      <p>Menú y comandas del restaurante</p>
+    </header>
+    <div id="toast" role="status"></div>
+
+    <section class="panel">
+      <h2>Nuevo plato</h2>
+      <form id="formulario">
+        <label>Tipo
+          <select id="tipo">
+            <option>Hamburguesa</option>
+            <option>Pizza</option>
+            <option>Bebida</option>
+          </select>
+        </label>
+        <label>Nombre
+          <input id="nombre" required>
+        </label>
+        <label>Precio base ($)
+          <input id="precio" type="number" step="100" required>
+        </label>
+        <button type="submit" id="guardar">Agregar al menú</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Menú</h2>
+      <div id="carta" class="grid"></div>
+    </section>
+  </main>
+
+  <script src="js/0-base.js"><\/script>
+</script>
+<script type="text/plain" data-k="j0">
+// js/0-base.js
+// Por ahora solo comprobamos que el formulario responde.
+const formulario = document.getElementById("formulario");
+const toast = document.getElementById("toast");
+
+function avisar(tipo, texto) {
+  toast.className = "";
+  void toast.offsetWidth;   // truco: reinicia la animación del mensaje
+  toast.className = tipo;
+  toast.textContent = texto;
+}
+
+formulario.addEventListener("submit", (e) => {
+  e.preventDefault();   // evita que la página se recargue al enviar
+  avisar("ok", "El formulario funciona. Falta la lógica.");
+});
+</script>
+
+<script type="text/plain" data-k="h1">
+  <main>
+    <header class="top">
+      <h1>🍔 ComandaYa</h1>
+      <p>Menú y comandas del restaurante</p>
+    </header>
+    <div id="toast" role="status"></div>
+
+    <section class="panel">
+      <h2>Nuevo plato</h2>
+      <form id="formulario">
+        <label>Tipo
+          <select id="tipo">
+            <option>Hamburguesa</option>
+            <option>Pizza</option>
+            <option>Bebida</option>
+          </select>
+        </label>
+        <label>Nombre
+          <input id="nombre" required>
+        </label>
+        <label>Precio base ($)
+          <input id="precio" type="number" step="100" required>
+        </label>
+        <button type="submit" id="guardar">Agregar al menú</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Menú</h2>
+      <div id="carta" class="grid"></div>
+    </section>
+  </main>
+
+  <script src="js/1-abstraccion.js"><\/script>
+</script>
+<script type="text/plain" data-k="j1">
+// js/1-abstraccion.js
+// ===== Abstracción: Plato es la idea general; nadie pide "un plato" a secas =====
+class Plato {
+  constructor(nombre, precio) {
+    if (new.target === Plato) {
+      throw new TypeError("Plato es abstracto: crea un tipo concreto, como Hamburguesa");
+    }
+    this.nombre = nombre;
+    this.precio = precio;
+  }
+
+  // Contrato: todo plato tiene un ícono, pero cada tipo decide cuál
+  icono() {
+    throw new Error(`${this.constructor.name} debe implementar icono()`);
+  }
+}
+
+class Hamburguesa extends Plato {
+  icono() {
+    return "🍔";
+  }
+}
+
+class Pizza extends Plato {
+  icono() {
+    return "🍕";
+  }
+}
+
+class Bebida extends Plato {
+  icono() {
+    return "🥤";
+  }
+}
+
+// ===== Conexión con la página =====
+const platos = [];
+const formulario = document.getElementById("formulario");
+const carta = document.getElementById("carta");
+const toast = document.getElementById("toast");
+let animar = { plato: null, clase: "" };   // qué tarjeta animar en el próximo dibujo
+
+function campo(id) {
+  return document.getElementById(id);
+}
+
+function avisar(tipo, texto) {
+  toast.className = "";
+  void toast.offsetWidth;   // truco: reinicia la animación del mensaje
+  toast.className = tipo;
+  toast.textContent = texto;
+}
+
+function pesos(valor) {
+  return "$" + valor.toLocaleString("es-CO");
+}
+
+// Crea una etiqueta HTML con su clase y su texto (textContent evita inyectar HTML)
+function el(etiqueta, clase, texto) {
+  const nodo = document.createElement(etiqueta);
+  nodo.className = clase;
+  if (texto !== undefined) nodo.textContent = texto;
+  return nodo;
+}
+
+function dibujar() {
+  carta.innerHTML = "";
+  if (platos.length === 0) {
+    carta.append(el("p", "vacio", "El menú está vacío. Agrega el primer plato."));
+  }
+  for (const p of platos) {
+    const tarjeta = el("article", "tarjeta");
+    if (p === animar.plato) tarjeta.classList.add(animar.clase);
+    const info = el("div", "info");
+    info.append(el("b", "", p.nombre), el("small", "", p.constructor.name));
+    tarjeta.append(el("span", "ico", p.icono()), info, el("span", "precio", pesos(p.precio)));
+    carta.append(tarjeta);
+  }
+  animar = { plato: null, clase: "" };   // cada animación se usa una sola vez
+}
+
+formulario.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = campo("tipo").value;
+  const nombre = campo("nombre").value;
+  const precio = Number(campo("precio").value);
+
+  let plato;
+  if (tipo === "Hamburguesa") plato = new Hamburguesa(nombre, precio);
+  else if (tipo === "Pizza") plato = new Pizza(nombre, precio);
+  else plato = new Bebida(nombre, precio);
+
+  platos.push(plato);
+  animar = { plato, clase: "entra" };
+  dibujar();
+  avisar("ok", `${plato.icono()} ${nombre} agregado al menú`);
+  formulario.reset();
+});
+
+dibujar();
+</script>
+
+<script type="text/plain" data-k="h2">
+  <main>
+    <header class="top">
+      <h1>🍔 ComandaYa</h1>
+      <p>Menú y comandas del restaurante</p>
+    </header>
+    <div id="toast" role="status"></div>
+
+    <section class="panel">
+      <h2>Nuevo plato</h2>
+      <form id="formulario">
+        <label>Tipo
+          <select id="tipo">
+            <option>Hamburguesa</option>
+            <option>Pizza</option>
+            <option>Bebida</option>
+          </select>
+        </label>
+        <label>Nombre
+          <input id="nombre" required>
+        </label>
+        <label>Precio base ($)
+          <input id="precio" type="number" step="100" required>
+        </label>
+        <button type="submit" id="guardar">Agregar al menú</button>
+        <button type="button" id="cancelar" class="suave" hidden>Cancelar</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Menú</h2>
+      <div id="carta" class="grid"></div>
+    </section>
+  </main>
+
+  <script src="js/2-encapsulamiento.js"><\/script>
+</script>
+<script type="text/plain" data-k="j2">
+// js/2-encapsulamiento.js
+// ===== Abstracción + Encapsulamiento =====
+class Plato {
+  static #contador = 0;   // privado y compartido por todos los platos
+  #id;                    // privado: nadie lo cambia desde afuera
+  #precio;                // privado: solo cambia pasando por el setter
+
+  constructor(nombre, precio) {
+    if (new.target === Plato) {
+      throw new TypeError("Plato es abstracto: crea un tipo concreto, como Hamburguesa");
+    }
+    this.#id = ++Plato.#contador;
+    this.nombre = nombre;
+    this.precio = precio;   // pasa por el setter: también se valida al crear
+  }
+
+  get id() {
+    return this.#id;   // solo lectura: no existe "set id"
+  }
+
+  get precio() {
+    return this.#precio;
+  }
+
+  set precio(valor) {
+    if (!Number.isFinite(valor) || valor <= 0) {
+      throw new RangeError("El precio debe ser un número mayor que 0");
+    }
+    this.#precio = valor;
+  }
+
+  // Contrato: todo plato tiene un ícono, pero cada tipo decide cuál
+  icono() {
+    throw new Error(`${this.constructor.name} debe implementar icono()`);
+  }
+}
+
+class Hamburguesa extends Plato {
+  icono() {
+    return "🍔";
+  }
+}
+
+class Pizza extends Plato {
+  icono() {
+    return "🍕";
+  }
+}
+
+class Bebida extends Plato {
+  icono() {
+    return "🥤";
+  }
+}
+
+// El menú protege su colección: solo se cambia con sus métodos (el CRUD)
+class Menu {
+  #platos = new Map();   // id → plato
+
+  agregar(plato) {
+    if (!(plato instanceof Plato)) {
+      throw new TypeError("Solo se pueden agregar platos al menú");
+    }
+    this.#platos.set(plato.id, plato);
+    return plato;
+  }
+
+  buscar(id) {
+    const plato = this.#platos.get(id);
+    if (!plato) throw new Error(`No existe el plato #${id}`);
+    return plato;
+  }
+
+  actualizar(id, datos) {
+    const plato = this.buscar(id);
+    plato.precio = datos.precio;   // primero el precio: si es inválido, no se toca nada más
+    plato.nombre = datos.nombre;
+    return plato;
+  }
+
+  eliminar(id) {
+    this.buscar(id);   // si no existe, lanza el error
+    this.#platos.delete(id);
+  }
+
+  get platos() {
+    return [...this.#platos.values()];   // una copia, nunca el Map original
+  }
+}
+
+// ===== Conexión con la página =====
+const menu = new Menu();
+const formulario = document.getElementById("formulario");
+const carta = document.getElementById("carta");
+const toast = document.getElementById("toast");
+const guardar = document.getElementById("guardar");
+const cancelar = document.getElementById("cancelar");
+let animar = { plato: null, clase: "" };   // qué tarjeta animar en el próximo dibujo
+let editando = null;   // id del plato que se edita, o null si estamos creando
+
+function campo(id) {
+  return document.getElementById(id);
+}
+
+function avisar(tipo, texto) {
+  toast.className = "";
+  void toast.offsetWidth;   // truco: reinicia la animación del mensaje
+  toast.className = tipo;
+  toast.textContent = texto;
+}
+
+function pesos(valor) {
+  return "$" + valor.toLocaleString("es-CO");
+}
+
+// Crea una etiqueta HTML con su clase y su texto (textContent evita inyectar HTML)
+function el(etiqueta, clase, texto) {
+  const nodo = document.createElement(etiqueta);
+  nodo.className = clase;
+  if (texto !== undefined) nodo.textContent = texto;
+  return nodo;
+}
+
+function botonCon(texto, clase, alPulsar) {
+  const boton = el("button", clase, texto);
+  boton.type = "button";
+  boton.addEventListener("click", (e) => {
+    e.stopPropagation();   // el clic se queda en el botón
+    alPulsar(boton);
+  });
+  return boton;
+}
+
+function dibujar() {
+  carta.innerHTML = "";
+  if (menu.platos.length === 0) {
+    carta.append(el("p", "vacio", "El menú está vacío. Agrega el primer plato."));
+  }
+  for (const p of menu.platos) {
+    const tarjeta = el("article", "tarjeta");
+    if (p === animar.plato) tarjeta.classList.add(animar.clase);
+    const info = el("div", "info");
+    info.append(el("b", "", p.nombre), el("small", "", `${p.constructor.name} · #${p.id}`));
+    const acciones = el("div", "acciones");
+    acciones.append(
+      botonCon("✏️ Editar", "suave editar", () => editar(p)),
+      botonCon("🗑️ Eliminar", "suave eliminar", (boton) => eliminar(p, tarjeta, boton)),
+    );
+    tarjeta.append(el("span", "ico", p.icono()), info, el("span", "precio", pesos(p.precio)), acciones);
+    carta.append(tarjeta);
+  }
+  animar = { plato: null, clase: "" };   // cada animación se usa una sola vez
+}
+
+function editar(plato) {
+  editando = plato.id;
+  campo("tipo").value = plato.constructor.name;
+  campo("tipo").disabled = true;   // al editar no se cambia el tipo de plato
+  campo("nombre").value = plato.nombre;
+  campo("precio").value = plato.precio;
+  formulario.classList.add("editando");
+  guardar.textContent = "Guardar cambios";
+  cancelar.hidden = false;
+  avisar("ok", `✏️ Editando ${plato.nombre}`);
+}
+
+function salirDeEdicion() {
+  editando = null;
+  formulario.reset();
+  campo("tipo").disabled = false;
+  formulario.classList.remove("editando");
+  guardar.textContent = "Agregar al menú";
+  cancelar.hidden = true;
+}
+
+function eliminar(plato, tarjeta, boton) {
+  if (!boton.dataset.seguro) {   // primer clic: pedir confirmación
+    boton.dataset.seguro = "si";
+    boton.textContent = "¿Seguro?";
+    return;
+  }
+  menu.eliminar(plato.id);
+  if (editando === plato.id) salirDeEdicion();
+  tarjeta.classList.add("sale");   // animación de salida...
+  setTimeout(dibujar, 300);        // ...y después se redibuja el menú
+  avisar("ok", `🗑️ ${plato.nombre} salió del menú`);
+}
+
+formulario.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = campo("tipo").value;
+  const nombre = campo("nombre").value;
+  const precio = Number(campo("precio").value);
+
+  try {
+    if (editando !== null) {
+      const plato = menu.actualizar(editando, { nombre, precio });
+      animar = { plato, clase: "brilla" };
+      avisar("ok", `${plato.icono()} ${nombre} actualizado`);
+      salirDeEdicion();
+    } else {
+      let plato;
+      if (tipo === "Hamburguesa") plato = new Hamburguesa(nombre, precio);
+      else if (tipo === "Pizza") plato = new Pizza(nombre, precio);
+      else plato = new Bebida(nombre, precio);
+
+      menu.agregar(plato);
+      animar = { plato, clase: "entra" };
+      avisar("ok", `${plato.icono()} ${nombre} agregado al menú`);
+      formulario.reset();
+    }
+    dibujar();
+  } catch (error) {
+    avisar("error", error.message);   // el mensaje rojo se sacude (lo hace el CSS)
+  }
+});
+
+cancelar.addEventListener("click", () => {
+  salirDeEdicion();
+  avisar("ok", "Edición cancelada");
+});
+
+dibujar();
+</script>
+
+<script type="text/plain" data-k="h3">
+  <main>
+    <header class="top">
+      <h1>🍔 ComandaYa</h1>
+      <p>Menú y comandas del restaurante</p>
+    </header>
+    <div id="toast" role="status"></div>
+
+    <section class="panel">
+      <h2>Nuevo plato</h2>
+      <form id="formulario">
+        <label>Tipo
+          <select id="tipo">
+            <option>Hamburguesa</option>
+            <option>Pizza</option>
+            <option>Bebida</option>
+          </select>
+        </label>
+        <label>Nombre
+          <input id="nombre" required>
+        </label>
+        <label>Precio base ($)
+          <input id="precio" type="number" step="100" required>
+        </label>
+        <label><span id="etiqueta">Carnes</span>
+          <select id="extra"></select>
+        </label>
+        <button type="submit" id="guardar">Agregar al menú</button>
+        <button type="button" id="cancelar" class="suave" hidden>Cancelar</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Menú</h2>
+      <div id="carta" class="grid"></div>
+    </section>
+  </main>
+
+  <script src="js/3-herencia.js"><\/script>
+</script>
+<script type="text/plain" data-k="j3">
+// js/3-herencia.js
+// ===== Abstracción + Encapsulamiento + Herencia =====
+class Plato {
+  static #contador = 0;   // privado y compartido por todos los platos
+  #id;                    // privado: nadie lo cambia desde afuera
+  #precio;                // privado: solo cambia pasando por el setter
+
+  constructor(nombre, precio) {
+    if (new.target === Plato) {
+      throw new TypeError("Plato es abstracto: crea un tipo concreto, como Hamburguesa");
+    }
+    this.#id = ++Plato.#contador;
+    this.nombre = nombre;
+    this.precio = precio;   // pasa por el setter: también se valida al crear
+  }
+
+  get id() {
+    return this.#id;   // solo lectura: no existe "set id"
+  }
+
+  get precio() {
+    return this.#precio;
+  }
+
+  set precio(valor) {
+    if (!Number.isFinite(valor) || valor <= 0) {
+      throw new RangeError("El precio debe ser un número mayor que 0");
+    }
+    this.#precio = valor;
+  }
+
+  // Lo común a todos: las hijas lo reutilizan con super.describir()
+  describir() {
+    return `${this.constructor.name} · #${this.#id}`;
+  }
+
+  // Lo común de editar; cada hija agrega sus propios datos con super.actualizar()
+  actualizar(datos) {
+    this.precio = datos.precio;   // primero el precio: si es inválido, no se toca nada más
+    this.nombre = datos.nombre;
+  }
+
+  // Contrato: todo plato tiene un ícono, pero cada tipo decide cuál
+  icono() {
+    throw new Error(`${this.constructor.name} debe implementar icono()`);
+  }
+
+  // Contrato: cada tipo entrega su dato propio para el campo "extra"
+  valorExtra() {
+    throw new Error(`${this.constructor.name} debe implementar valorExtra()`);
+  }
+}
+
+class Hamburguesa extends Plato {
+  constructor(nombre, precio, carnes) {
+    super(nombre, precio);   // primero se construye la parte Plato
+    this.carnes = carnes;    // y luego lo propio de la hamburguesa
+  }
+
+  icono() {
+    return "🍔";
+  }
+
+  valorExtra() {
+    return String(this.carnes);
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.carnes} carne(s)`;
+  }
+
+  actualizar(datos) {
+    super.actualizar(datos);
+    this.carnes = Number(datos.extra);
+  }
+}
+
+class Pizza extends Plato {
+  constructor(nombre, precio, tamano) {
+    super(nombre, precio);
+    this.tamano = tamano;
+  }
+
+  icono() {
+    return "🍕";
+  }
+
+  valorExtra() {
+    return this.tamano;
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.tamano}`;
+  }
+
+  actualizar(datos) {
+    super.actualizar(datos);
+    this.tamano = datos.extra;
+  }
+}
+
+class Bebida extends Plato {
+  constructor(nombre, precio, ml) {
+    super(nombre, precio);
+    this.ml = ml;
+  }
+
+  icono() {
+    return "🥤";
+  }
+
+  valorExtra() {
+    return String(this.ml);
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.ml} ml`;
+  }
+
+  actualizar(datos) {
+    super.actualizar(datos);
+    this.ml = Number(datos.extra);
+  }
+}
+
+// El menú protege su colección: solo se cambia con sus métodos (el CRUD)
+class Menu {
+  #platos = new Map();   // id → plato
+
+  agregar(plato) {
+    if (!(plato instanceof Plato)) {
+      throw new TypeError("Solo se pueden agregar platos al menú");
+    }
+    this.#platos.set(plato.id, plato);
+    return plato;
+  }
+
+  buscar(id) {
+    const plato = this.#platos.get(id);
+    if (!plato) throw new Error(`No existe el plato #${id}`);
+    return plato;
+  }
+
+  actualizar(id, datos) {
+    const plato = this.buscar(id);
+    plato.actualizar(datos);   // cada tipo sabe actualizar sus propios datos
+    return plato;
+  }
+
+  eliminar(id) {
+    this.buscar(id);   // si no existe, lanza el error
+    this.#platos.delete(id);
+  }
+
+  get platos() {
+    return [...this.#platos.values()];   // una copia, nunca el Map original
+  }
+}
+
+// ===== Conexión con la página =====
+const menu = new Menu();
+const formulario = document.getElementById("formulario");
+const carta = document.getElementById("carta");
+const toast = document.getElementById("toast");
+const guardar = document.getElementById("guardar");
+const cancelar = document.getElementById("cancelar");
+let animar = { plato: null, clase: "" };   // qué tarjeta animar en el próximo dibujo
+let editando = null;   // id del plato que se edita, o null si estamos creando
+
+// Etiqueta y opciones del campo extra según el tipo (con coma al final: agregar es fácil)
+const ETIQUETAS = {
+  Hamburguesa: "Carnes",
+  Pizza: "Tamaño",
+  Bebida: "Mililitros",
+};
+const OPCIONES = {
+  Hamburguesa: ["1", "2", "3"],
+  Pizza: ["Personal", "Mediana", "Familiar"],
+  Bebida: ["350", "500", "1000"],
+};
+
+// Una fábrica por tipo: así no hace falta un if / else por cada plato
+const fabricas = {
+  Hamburguesa: (nombre, precio, extra) => new Hamburguesa(nombre, precio, Number(extra)),
+  Pizza: (nombre, precio, extra) => new Pizza(nombre, precio, extra),
+  Bebida: (nombre, precio, extra) => new Bebida(nombre, precio, Number(extra)),
+};
+
+function campo(id) {
+  return document.getElementById(id);
+}
+
+function avisar(tipo, texto) {
+  toast.className = "";
+  void toast.offsetWidth;   // truco: reinicia la animación del mensaje
+  toast.className = tipo;
+  toast.textContent = texto;
+}
+
+function pesos(valor) {
+  return "$" + valor.toLocaleString("es-CO");
+}
+
+// Crea una etiqueta HTML con su clase y su texto (textContent evita inyectar HTML)
+function el(etiqueta, clase, texto) {
+  const nodo = document.createElement(etiqueta);
+  nodo.className = clase;
+  if (texto !== undefined) nodo.textContent = texto;
+  return nodo;
+}
+
+function botonCon(texto, clase, alPulsar) {
+  const boton = el("button", clase, texto);
+  boton.type = "button";
+  boton.addEventListener("click", (e) => {
+    e.stopPropagation();   // el clic se queda en el botón
+    alPulsar(boton);
+  });
+  return boton;
+}
+
+function prepararExtra() {
+  const tipo = campo("tipo").value;
+  campo("etiqueta").textContent = ETIQUETAS[tipo];
+  campo("extra").innerHTML = "";
+  for (const valor of OPCIONES[tipo]) {
+    campo("extra").append(new Option(valor, valor));
+  }
+}
+
+function dibujar() {
+  carta.innerHTML = "";
+  if (menu.platos.length === 0) {
+    carta.append(el("p", "vacio", "El menú está vacío. Agrega el primer plato."));
+  }
+  for (const p of menu.platos) {
+    const tarjeta = el("article", "tarjeta");
+    if (p === animar.plato) tarjeta.classList.add(animar.clase);
+    const info = el("div", "info");
+    info.append(el("b", "", p.nombre), el("small", "", p.describir()));
+    const acciones = el("div", "acciones");
+    acciones.append(
+      botonCon("✏️ Editar", "suave editar", () => editar(p)),
+      botonCon("🗑️ Eliminar", "suave eliminar", (boton) => eliminar(p, tarjeta, boton)),
+    );
+    tarjeta.append(el("span", "ico", p.icono()), info, el("span", "precio", pesos(p.precio)), acciones);
+    carta.append(tarjeta);
+  }
+  animar = { plato: null, clase: "" };   // cada animación se usa una sola vez
+}
+
+function editar(plato) {
+  editando = plato.id;
+  campo("tipo").value = plato.constructor.name;
+  campo("tipo").disabled = true;   // al editar no se cambia el tipo de plato
+  prepararExtra();
+  campo("nombre").value = plato.nombre;
+  campo("precio").value = plato.precio;
+  campo("extra").value = plato.valorExtra();
+  formulario.classList.add("editando");
+  guardar.textContent = "Guardar cambios";
+  cancelar.hidden = false;
+  avisar("ok", `✏️ Editando ${plato.nombre}`);
+}
+
+function salirDeEdicion() {
+  editando = null;
+  formulario.reset();
+  campo("tipo").disabled = false;
+  prepararExtra();
+  formulario.classList.remove("editando");
+  guardar.textContent = "Agregar al menú";
+  cancelar.hidden = true;
+}
+
+function eliminar(plato, tarjeta, boton) {
+  if (!boton.dataset.seguro) {   // primer clic: pedir confirmación
+    boton.dataset.seguro = "si";
+    boton.textContent = "¿Seguro?";
+    return;
+  }
+  menu.eliminar(plato.id);
+  if (editando === plato.id) salirDeEdicion();
+  tarjeta.classList.add("sale");   // animación de salida...
+  setTimeout(dibujar, 300);        // ...y después se redibuja el menú
+  avisar("ok", `🗑️ ${plato.nombre} salió del menú`);
+}
+
+formulario.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = campo("tipo").value;
+  const nombre = campo("nombre").value;
+  const precio = Number(campo("precio").value);
+  const extra = campo("extra").value;
+
+  try {
+    if (editando !== null) {
+      const plato = menu.actualizar(editando, { nombre, precio, extra });
+      animar = { plato, clase: "brilla" };
+      avisar("ok", `${plato.icono()} ${nombre} actualizado`);
+      salirDeEdicion();
+    } else {
+      const plato = fabricas[tipo](nombre, precio, extra);
+      menu.agregar(plato);
+      animar = { plato, clase: "entra" };
+      avisar("ok", `${plato.icono()} ${nombre} agregado al menú`);
+      formulario.reset();
+      prepararExtra();
+    }
+    dibujar();
+  } catch (error) {
+    avisar("error", error.message);   // el mensaje rojo se sacude (lo hace el CSS)
+  }
+});
+
+campo("tipo").addEventListener("change", prepararExtra);
+
+cancelar.addEventListener("click", () => {
+  salirDeEdicion();
+  avisar("ok", "Edición cancelada");
+});
+
+prepararExtra();
+dibujar();
+</script>
+
+<script type="text/plain" data-k="h4">
+  <main>
+    <header class="top">
+      <h1>🍔 ComandaYa</h1>
+      <p>Menú y comandas del restaurante</p>
+    </header>
+    <div id="toast" role="status"></div>
+
+    <section class="panel">
+      <h2>Nuevo plato</h2>
+      <form id="formulario">
+        <label>Tipo
+          <select id="tipo">
+            <option>Hamburguesa</option>
+            <option>Pizza</option>
+            <option>Bebida</option>
+          </select>
+        </label>
+        <label>Nombre
+          <input id="nombre" required>
+        </label>
+        <label>Precio base ($)
+          <input id="precio" type="number" step="100" required>
+        </label>
+        <label><span id="etiqueta">Carnes</span>
+          <select id="extra"></select>
+        </label>
+        <button type="submit" id="guardar">Agregar al menú</button>
+        <button type="button" id="cancelar" class="suave" hidden>Cancelar</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Menú</h2>
+      <div id="carta" class="grid"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Comandas</h2>
+      <form id="form-orden">
+        <label>Mesa
+          <input id="mesa" type="number" min="1" required>
+        </label>
+        <button type="submit">Abrir orden</button>
+      </form>
+      <div id="tablero" class="tablero"></div>
+      <p class="ventas">Ventas del día: <b id="ventas">$0</b></p>
+    </section>
+  </main>
+
+  <script src="js/4-polimorfismo.js"><\/script>
+</script>
+<script type="text/plain" data-k="j4">
+// js/4-polimorfismo.js
+// ===== Abstracción + Encapsulamiento + Herencia + Polimorfismo =====
+class Plato {
+  static #contador = 0;   // privado y compartido por todos los platos
+  #id;                    // privado: nadie lo cambia desde afuera
+  #precio;                // privado: solo cambia pasando por el setter
+
+  constructor(nombre, precio) {
+    if (new.target === Plato) {
+      throw new TypeError("Plato es abstracto: crea un tipo concreto, como Hamburguesa");
+    }
+    this.#id = ++Plato.#contador;
+    this.nombre = nombre;
+    this.precio = precio;   // pasa por el setter: también se valida al crear
+  }
+
+  get id() {
+    return this.#id;   // solo lectura: no existe "set id"
+  }
+
+  get precio() {
+    return this.#precio;
+  }
+
+  set precio(valor) {
+    if (!Number.isFinite(valor) || valor <= 0) {
+      throw new RangeError("El precio debe ser un número mayor que 0");
+    }
+    this.#precio = valor;
+  }
+
+  // Lo común a todos: las hijas lo reutilizan con super.describir()
+  describir() {
+    return `${this.constructor.name} · #${this.#id}`;
+  }
+
+  // Lo común de editar; cada hija agrega sus propios datos con super.actualizar()
+  actualizar(datos) {
+    this.precio = datos.precio;   // primero el precio: si es inválido, no se toca nada más
+    this.nombre = datos.nombre;
+  }
+
+  // Contrato: todo plato tiene un ícono, pero cada tipo decide cuál
+  icono() {
+    throw new Error(`${this.constructor.name} debe implementar icono()`);
+  }
+
+  // Contrato: cada tipo entrega su dato propio para el campo "extra"
+  valorExtra() {
+    throw new Error(`${this.constructor.name} debe implementar valorExtra()`);
+  }
+
+  // Contrato del polimorfismo: cada tipo calcula su precio final...
+  calcularPrecio() {
+    throw new Error(`${this.constructor.name} debe implementar calcularPrecio()`);
+  }
+
+  // ...y cuántos minutos tarda en cocina
+  tiempoPreparacion() {
+    throw new Error(`${this.constructor.name} debe implementar tiempoPreparacion()`);
+  }
+}
+
+class Hamburguesa extends Plato {
+  constructor(nombre, precio, carnes) {
+    super(nombre, precio);   // primero se construye la parte Plato
+    this.carnes = carnes;    // y luego lo propio de la hamburguesa
+  }
+
+  icono() {
+    return "🍔";
+  }
+
+  valorExtra() {
+    return String(this.carnes);
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.carnes} carne(s)`;
+  }
+
+  actualizar(datos) {
+    super.actualizar(datos);
+    this.carnes = Number(datos.extra);
+  }
+
+  calcularPrecio() {
+    return this.precio + (this.carnes - 1) * 4000;   // cada carne extra suma $4.000
+  }
+
+  tiempoPreparacion() {
+    return 8 + this.carnes * 3;
+  }
+}
+
+class Pizza extends Plato {
+  static RECARGO = { Personal: 0, Mediana: 8000, Familiar: 16000 };
+
+  constructor(nombre, precio, tamano) {
+    super(nombre, precio);
+    this.tamano = tamano;
+  }
+
+  icono() {
+    return "🍕";
+  }
+
+  valorExtra() {
+    return this.tamano;
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.tamano}`;
+  }
+
+  actualizar(datos) {
+    super.actualizar(datos);
+    this.tamano = datos.extra;
+  }
+
+  calcularPrecio() {
+    return this.precio + Pizza.RECARGO[this.tamano];
+  }
+
+  tiempoPreparacion() {
+    return this.tamano === "Familiar" ? 20 : 15;
+  }
+}
+
+class Bebida extends Plato {
+  static RECARGO = { 350: 0, 500: 1500, 1000: 3000 };
+
+  constructor(nombre, precio, ml) {
+    super(nombre, precio);
+    this.ml = ml;
+  }
+
+  icono() {
+    return "🥤";
+  }
+
+  valorExtra() {
+    return String(this.ml);
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.ml} ml`;
+  }
+
+  actualizar(datos) {
+    super.actualizar(datos);
+    this.ml = Number(datos.extra);
+  }
+
+  calcularPrecio() {
+    return this.precio + Bebida.RECARGO[this.ml];
+  }
+
+  tiempoPreparacion() {
+    return 2;
+  }
+}
+
+// El menú protege su colección: solo se cambia con sus métodos (el CRUD)
+class Menu {
+  #platos = new Map();   // id → plato
+
+  agregar(plato) {
+    if (!(plato instanceof Plato)) {
+      throw new TypeError("Solo se pueden agregar platos al menú");
+    }
+    this.#platos.set(plato.id, plato);
+    return plato;
+  }
+
+  buscar(id) {
+    const plato = this.#platos.get(id);
+    if (!plato) throw new Error(`No existe el plato #${id}`);
+    return plato;
+  }
+
+  actualizar(id, datos) {
+    const plato = this.buscar(id);
+    plato.actualizar(datos);   // cada tipo sabe actualizar sus propios datos
+    return plato;
+  }
+
+  eliminar(id) {
+    this.buscar(id);   // si no existe, lanza el error
+    this.#platos.delete(id);
+  }
+
+  get platos() {
+    return [...this.#platos.values()];   // una copia, nunca el Map original
+  }
+}
+
+// ===== Las comandas =====
+// Una orden AGRUPA platos (agregación): los platos siguen en el menú aunque la orden se cancele
+class Orden {
+  static ESTADOS = ["Pendiente", "En cocina", "Lista", "Entregada"];
+  static #contador = 0;
+  #id;
+  #mesa;
+  #items = [];
+  #paso = 0;   // posición en ESTADOS: solo avanza de uno en uno
+
+  constructor(mesa) {
+    if (!Number.isInteger(mesa) || mesa < 1) {
+      throw new RangeError("La mesa debe ser un número entero desde 1");
+    }
+    this.#id = ++Orden.#contador;
+    this.#mesa = mesa;
+  }
+
+  get id() { return this.#id; }
+  get mesa() { return this.#mesa; }
+  get estado() { return Orden.ESTADOS[this.#paso]; }
+  get items() { return [...this.#items]; }
+
+  agregar(plato) {
+    if (!(plato instanceof Plato)) throw new TypeError("Solo se pueden pedir platos");
+    if (this.#paso > 0) throw new Error(`La orden #${this.#id} ya está ${this.estado}: no admite más platos`);
+    this.#items.push(plato);
+  }
+
+  quitar(indice) {
+    if (this.#paso > 0) throw new Error(`La orden #${this.#id} ya está ${this.estado}: no se puede quitar nada`);
+    this.#items.splice(indice, 1);
+  }
+
+  avanzar() {
+    if (this.#items.length === 0) throw new Error("No se puede enviar a cocina una orden vacía");
+    if (this.#paso === Orden.ESTADOS.length - 1) throw new Error(`La orden #${this.#id} ya fue entregada`);
+    this.#paso++;
+  }
+
+  // POLIMORFISMO: suma sin preguntar si es hamburguesa, pizza o bebida
+  total() {
+    return this.#items.reduce((suma, plato) => suma + plato.calcularPrecio(), 0);
+  }
+
+  // La cocina prepara en paralelo: la orden tarda lo que tarde su plato más lento
+  tiempo() {
+    return this.#items.reduce((mayor, plato) => Math.max(mayor, plato.tiempoPreparacion()), 0);
+  }
+}
+
+// El restaurante COMPONE sus órdenes: las crea, las guarda y las cancela (CRUD de órdenes)
+class Restaurante {
+  #ordenes = new Map();   // id → orden
+
+  abrirOrden(mesa) {
+    const orden = new Orden(mesa);
+    this.#ordenes.set(orden.id, orden);
+    return orden;
+  }
+
+  buscar(id) {
+    const orden = this.#ordenes.get(id);
+    if (!orden) throw new Error(`No existe la orden #${id}`);
+    return orden;
+  }
+
+  cancelar(id) {
+    const orden = this.buscar(id);
+    if (orden.estado === "Entregada") throw new Error("Una orden entregada no se puede cancelar");
+    this.#ordenes.delete(id);
+  }
+
+  get ordenes() {
+    return [...this.#ordenes.values()];
+  }
+
+  // POLIMORFISMO: cada orden suma sus platos; aquí solo se suman las órdenes entregadas
+  ventasDelDia() {
+    return this.ordenes
+      .filter((orden) => orden.estado === "Entregada")
+      .reduce((suma, orden) => suma + orden.total(), 0);
+  }
+}
+
+// ===== Conexión con la página =====
+const menu = new Menu();
+const restaurante = new Restaurante();
+const formulario = document.getElementById("formulario");
+const carta = document.getElementById("carta");
+const toast = document.getElementById("toast");
+const guardar = document.getElementById("guardar");
+const cancelar = document.getElementById("cancelar");
+const tablero = document.getElementById("tablero");
+const ventas = document.getElementById("ventas");
+let animar = { plato: null, clase: "" };   // qué tarjeta animar en el próximo dibujo
+let editando = null;   // id del plato que se edita, o null si estamos creando
+let activa = null;     // la orden donde caen los platos que se piden
+let movida = null;     // la orden que acaba de cambiar de columna
+
+// Etiqueta y opciones del campo extra según el tipo (con coma al final: agregar es fácil)
+const ETIQUETAS = {
+  Hamburguesa: "Carnes",
+  Pizza: "Tamaño",
+  Bebida: "Mililitros",
+};
+const OPCIONES = {
+  Hamburguesa: ["1", "2", "3"],
+  Pizza: ["Personal", "Mediana", "Familiar"],
+  Bebida: ["350", "500", "1000"],
+};
+
+// Una fábrica por tipo: así no hace falta un if / else por cada plato
+const fabricas = {
+  Hamburguesa: (nombre, precio, extra) => new Hamburguesa(nombre, precio, Number(extra)),
+  Pizza: (nombre, precio, extra) => new Pizza(nombre, precio, extra),
+  Bebida: (nombre, precio, extra) => new Bebida(nombre, precio, Number(extra)),
+};
+
+function campo(id) {
+  return document.getElementById(id);
+}
+
+function avisar(tipo, texto) {
+  toast.className = "";
+  void toast.offsetWidth;   // truco: reinicia la animación del mensaje
+  toast.className = tipo;
+  toast.textContent = texto;
+}
+
+function pesos(valor) {
+  return "$" + valor.toLocaleString("es-CO");
+}
+
+// Crea una etiqueta HTML con su clase y su texto (textContent evita inyectar HTML)
+function el(etiqueta, clase, texto) {
+  const nodo = document.createElement(etiqueta);
+  nodo.className = clase;
+  if (texto !== undefined) nodo.textContent = texto;
+  return nodo;
+}
+
+function botonCon(texto, clase, alPulsar) {
+  const boton = el("button", clase, texto);
+  boton.type = "button";
+  boton.addEventListener("click", (e) => {
+    e.stopPropagation();   // el clic se queda en el botón
+    alPulsar(boton);
+  });
+  return boton;
+}
+
+// Anima un número desde el valor que muestra hasta el nuevo
+function animarNumero(nodo, hasta) {
+  const desde = Number(nodo.dataset.valor || 0);
+  nodo.dataset.valor = hasta;
+  const inicio = performance.now();
+  function cuadro(ahora) {
+    const avance = Math.min((ahora - inicio) / 600, 1);
+    nodo.textContent = pesos(Math.round(desde + (hasta - desde) * avance));
+    if (avance < 1) requestAnimationFrame(cuadro);
+  }
+  requestAnimationFrame(cuadro);
+}
+
+function prepararExtra() {
+  const tipo = campo("tipo").value;
+  campo("etiqueta").textContent = ETIQUETAS[tipo];
+  campo("extra").innerHTML = "";
+  for (const valor of OPCIONES[tipo]) {
+    campo("extra").append(new Option(valor, valor));
+  }
+}
+
+function dibujar() {
+  carta.innerHTML = "";
+  if (menu.platos.length === 0) {
+    carta.append(el("p", "vacio", "El menú está vacío. Agrega el primer plato."));
+  }
+  for (const p of menu.platos) {
+    const tarjeta = el("article", "tarjeta");
+    if (p === animar.plato) tarjeta.classList.add(animar.clase);
+    const info = el("div", "info");
+    info.append(el("b", "", p.nombre), el("small", "", `${p.describir()} · ⏱ ${p.tiempoPreparacion()} min`));
+    const acciones = el("div", "acciones");
+    acciones.append(
+      botonCon("✏️ Editar", "suave editar", () => editar(p)),
+      botonCon("🗑️ Eliminar", "suave eliminar", (boton) => eliminar(p, tarjeta, boton)),
+      botonCon("＋ Pedir", "pedir", () => pedir(p)),
+    );
+    tarjeta.append(el("span", "ico", p.icono()), info, el("span", "precio", pesos(p.calcularPrecio())), acciones);
+    carta.append(tarjeta);
+  }
+  animar = { plato: null, clase: "" };   // cada animación se usa una sola vez
+}
+
+function editar(plato) {
+  editando = plato.id;
+  campo("tipo").value = plato.constructor.name;
+  campo("tipo").disabled = true;   // al editar no se cambia el tipo de plato
+  prepararExtra();
+  campo("nombre").value = plato.nombre;
+  campo("precio").value = plato.precio;
+  campo("extra").value = plato.valorExtra();
+  formulario.classList.add("editando");
+  guardar.textContent = "Guardar cambios";
+  cancelar.hidden = false;
+  avisar("ok", `✏️ Editando ${plato.nombre}`);
+}
+
+function salirDeEdicion() {
+  editando = null;
+  formulario.reset();
+  campo("tipo").disabled = false;
+  prepararExtra();
+  formulario.classList.remove("editando");
+  guardar.textContent = "Agregar al menú";
+  cancelar.hidden = true;
+}
+
+function eliminar(plato, tarjeta, boton) {
+  if (!boton.dataset.seguro) {   // primer clic: pedir confirmación
+    boton.dataset.seguro = "si";
+    boton.textContent = "¿Seguro?";
+    return;
+  }
+  menu.eliminar(plato.id);
+  if (editando === plato.id) salirDeEdicion();
+  tarjeta.classList.add("sale");   // animación de salida...
+  setTimeout(dibujar, 300);        // ...y después se redibuja el menú
+  avisar("ok", `🗑️ ${plato.nombre} salió del menú`);
+}
+
+// ----- Tablero de comandas -----
+function tarjetaOrden(orden) {
+  const caja = el("article", "orden");
+  if (orden === activa) caja.classList.add("activa");
+  if (orden === movida) caja.classList.add("llega");
+  caja.addEventListener("click", () => {
+    activa = orden;   // clic en una orden: ahí caerán los próximos platos
+    dibujarOrdenes();
+  });
+  caja.append(el("b", "", `Mesa ${orden.mesa} · #${orden.id}`));
+  const lista = el("ul", "");
+  orden.items.forEach((plato, indice) => {
+    const fila = el("li", "", `${plato.icono()} ${plato.nombre} ${pesos(plato.calcularPrecio())}`);
+    fila.append(botonCon("✕", "quitar", () => quitar(orden, indice)));
+    lista.append(fila);
+  });
+  const pie = el("div", "pie");
+  pie.append(el("span", "", `⏱ ${orden.tiempo()} min`), el("span", "", pesos(orden.total())));
+  const botones = el("div", "botones");
+  botones.append(
+    botonCon("Avanzar ▶", "avanzar", () => avanzar(orden)),
+    botonCon("Cancelar", "suave cancelar", () => cancelarOrden(orden)),
+  );
+  caja.append(lista, pie, botones);
+  return caja;
+}
+
+function dibujarOrdenes() {
+  tablero.innerHTML = "";
+  for (const estado of Orden.ESTADOS) {
+    const columna = el("div", "columna");
+    columna.append(el("h3", "", estado));
+    for (const orden of restaurante.ordenes.filter((o) => o.estado === estado)) {
+      columna.append(tarjetaOrden(orden));
+    }
+    tablero.append(columna);
+  }
+  animarNumero(ventas, restaurante.ventasDelDia());
+  movida = null;
+}
+
+function pedir(plato) {
+  try {
+    if (!activa) throw new Error("Primero abre una orden con el número de mesa");
+    activa.agregar(plato);
+    avisar("ok", `${plato.icono()} ${plato.nombre} → mesa ${activa.mesa}`);
+    dibujarOrdenes();
+  } catch (error) {
+    avisar("error", error.message);
+  }
+}
+
+function quitar(orden, indice) {
+  try {
+    orden.quitar(indice);
+    avisar("ok", `Plato quitado de la mesa ${orden.mesa}`);
+    dibujarOrdenes();
+  } catch (error) {
+    avisar("error", error.message);
+  }
+}
+
+function avanzar(orden) {
+  try {
+    orden.avanzar();
+    movida = orden;
+    avisar("ok", `Mesa ${orden.mesa}: ${orden.estado}`);
+    dibujarOrdenes();
+  } catch (error) {
+    avisar("error", error.message);
+  }
+}
+
+function cancelarOrden(orden) {
+  try {
+    restaurante.cancelar(orden.id);
+    if (activa === orden) activa = null;
+    avisar("ok", `Orden #${orden.id} cancelada`);
+    dibujarOrdenes();
+  } catch (error) {
+    avisar("error", error.message);
+  }
+}
+
+formulario.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = campo("tipo").value;
+  const nombre = campo("nombre").value;
+  const precio = Number(campo("precio").value);
+  const extra = campo("extra").value;
+
+  try {
+    if (editando !== null) {
+      const plato = menu.actualizar(editando, { nombre, precio, extra });
+      animar = { plato, clase: "brilla" };
+      avisar("ok", `${plato.icono()} ${nombre} actualizado`);
+      salirDeEdicion();
+    } else {
+      const plato = fabricas[tipo](nombre, precio, extra);
+      menu.agregar(plato);
+      animar = { plato, clase: "entra" };
+      avisar("ok", `${plato.icono()} ${nombre} agregado al menú`);
+      formulario.reset();
+      prepararExtra();
+    }
+    dibujar();
+  } catch (error) {
+    avisar("error", error.message);   // el mensaje rojo se sacude (lo hace el CSS)
+  }
+});
+
+campo("form-orden").addEventListener("submit", (e) => {
+  e.preventDefault();
+  try {
+    activa = restaurante.abrirOrden(Number(campo("mesa").value));
+    movida = activa;
+    avisar("ok", `Orden #${activa.id} abierta para la mesa ${activa.mesa}: pide con ＋`);
+    e.target.reset();
+    dibujarOrdenes();
+  } catch (error) {
+    avisar("error", error.message);
+  }
+});
+
+campo("tipo").addEventListener("change", prepararExtra);
+
+cancelar.addEventListener("click", () => {
+  salirDeEdicion();
+  avisar("ok", "Edición cancelada");
+});
+
+// Datos de ejemplo para probar las comandas sin escribir todo cada vez
+menu.agregar(new Hamburguesa("Clásica", 18000, 2));
+menu.agregar(new Pizza("Hawaiana", 20000, "Familiar"));
+menu.agregar(new Bebida("Limonada", 5000, 1000));
+
+prepararExtra();
+dibujar();
+dibujarOrdenes();
+</script>
+
+<script type="text/plain" data-k="h5">
+  <main>
+    <header class="top">
+      <h1>🍔 ComandaYa</h1>
+      <p>Menú y comandas del restaurante</p>
+    </header>
+    <div id="toast" role="status"></div>
+
+    <section class="panel">
+      <h2>Nuevo plato</h2>
+      <form id="formulario">
+        <label>Tipo
+          <select id="tipo">
+            <option>Hamburguesa</option>
+            <option>Pizza</option>
+            <option>Bebida</option>
+            <option>Postre</option>
+          </select>
+        </label>
+        <label>Nombre
+          <input id="nombre" required>
+        </label>
+        <label>Precio base ($)
+          <input id="precio" type="number" step="100" required>
+        </label>
+        <label><span id="etiqueta">Carnes</span>
+          <select id="extra"></select>
+        </label>
+        <button type="submit" id="guardar">Agregar al menú</button>
+        <button type="button" id="cancelar" class="suave" hidden>Cancelar</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Menú</h2>
+      <div id="carta" class="grid"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Comandas</h2>
+      <form id="form-orden">
+        <label>Mesa
+          <input id="mesa" type="number" min="1" required>
+        </label>
+        <button type="submit">Abrir orden</button>
+      </form>
+      <div id="tablero" class="tablero"></div>
+      <p class="ventas">Ventas del día: <b id="ventas">$0</b></p>
+    </section>
+  </main>
+
+  <script src="js/5-reto.js"><\/script>
+</script>
+<script type="text/plain" data-k="j5-extra-postre">
+class Postre extends Plato {
+  constructor(nombre, precio, porcion) {
+    super(nombre, precio);
+    this.porcion = porcion;
+  }
+
+  icono() {
+    return "🍰";
+  }
+
+  valorExtra() {
+    return this.porcion;
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.porcion}`;
+  }
+
+  actualizar(datos) {
+    super.actualizar(datos);
+    this.porcion = datos.extra;
+  }
+
+  calcularPrecio() {
+    return this.porcion === "Para compartir" ? this.precio + 6000 : this.precio;
+  }
+
+  tiempoPreparacion() {
+    return 5;
+  }
+}
+
+</script>
+
+<script type="text/plain" data-k="readme">
+# 🍔 ComandaYa
+
+Sistema web de comandas para un restaurante: menú con CRUD completo y tablero de órdenes por mesa. Proyecto de práctica de **Programación Orientada a Objetos** en JavaScript — SENA · ADSO.
+
+## ¿Qué hace?
+
+- **CRUD del menú:** crear, listar, editar y eliminar hamburguesas, pizzas, bebidas y postres.
+- Valida que el precio sea un número mayor que 0.
+- **Comandas:** abrir una orden por mesa, pedir y quitar platos, avanzar su estado (Pendiente → En cocina → Lista → Entregada) y cancelarla.
+- Calcula el precio final, el tiempo de preparación y las ventas del día.
+- Animaciones con CSS: entrada, edición, salida, errores y cambio de columna.
+
+## Pilares de POO aplicados
+
+| Pilar | Dónde se ve |
+|---|---|
+| Abstracción | `Plato` no se puede instanciar; solo define el contrato |
+| Encapsulamiento | `#precio` con get/set, `#platos` en `Menu`, `#items` y `#paso` en `Orden` |
+| Herencia | `Hamburguesa`, `Pizza`, `Bebida` y `Postre` extienden `Plato` con `super` |
+| Polimorfismo | `calcularPrecio()` y `tiempoPreparacion()` responden distinto en cada clase |
+
+## Diagrama de clases
+
+```mermaid
+classDiagram
+  class Plato {
+    <<abstract>>
+    -id
+    -precio
+    +nombre
+    +describir()
+    +icono()*
+    +calcularPrecio()*
+    +tiempoPreparacion()*
+  }
+  class Menu {
+    -platos
+    +agregar(plato)
+    +actualizar(id, datos)
+    +eliminar(id)
+  }
+  class Orden {
+    -items
+    -paso
+    +agregar(plato)
+    +avanzar()
+    +total()
+  }
+  class Restaurante {
+    -ordenes
+    +abrirOrden(mesa)
+    +cancelar(id)
+    +ventasDelDia()
+  }
+  Plato <|-- Hamburguesa
+  Plato <|-- Pizza
+  Plato <|-- Bebida
+  Plato <|-- Postre
+  Menu *-- Plato
+  Restaurante *-- Orden
+  Orden o-- Plato
+```
+
+## Tecnologías
+
+HTML5, CSS3 y JavaScript (ES2022: campos privados `#` y `static`). No necesita instalación ni librerías.
+
+## Cómo ejecutarlo
+
+1. Clona el repositorio:
+   ```
+   git clone https://github.com/TU_USUARIO/comanda-ya.git
+   ```
+2. Abre el archivo `index.html` con doble clic en tu navegador.
+
+## Estructura
+
+```
+comanda-ya/
+├── index.html
+├── css/
+│   └── estilos.css
+├── js/
+│   ├── 0-base.js
+│   ├── 1-abstraccion.js
+│   ├── 2-encapsulamiento.js
+│   ├── 3-herencia.js
+│   ├── 4-polimorfismo.js
+│   └── 5-reto.js
+└── README.md
+```
+
+Para ver cada versión, cambia la línea `<script src="js/...">` al final de `index.html`.
+
+## Historial por fases
+
+Los commits siguen la convención *Conventional Commits* (`feat`, `fix`, `style`, `docs`...):
+
+1. `style` y `feat`: estilos, animaciones y estructura base
+2. `feat`: abstracción con `Plato`, `Hamburguesa`, `Pizza` y `Bebida`
+3. `fix` y `feat`: precio validado y CRUD con `Menu`
+4. `feat`: herencia con datos propios por tipo
+5. `feat`: polimorfismo y tablero de comandas
+6. `feat`: reto `Postre` sin modificar el código existente
+
+## Autor
+
+Tu Nombre Apellido · Ficha XXXXXXX · SENA — Análisis y Desarrollo de Software
+</script>
+
+<!-- ======================= MOTOR DE LA GUÍA ======================= -->
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var show = function (v) { if (v === undefined) return 'undefined'; try { var s = JSON.stringify(v); return s === undefined ? String(v) : s; } catch (e) { return String(v); } };
+  var CLOSE = '</scr' + 'ipt>';
+  var txt = function (k) { var el = $('script[data-k="' + k + '"]'); return el ? el.textContent.replace(/^\n/, '').replace(/\s+$/, '').split('<\\/script>').join(CLOSE) : ''; };
+
+  var FILES = ['0-base.js', '1-abstraccion.js', '2-encapsulamiento.js', '3-herencia.js', '4-polimorfismo.js', '5-reto.js'];
+  var CSS = txt('css');
+  var H = [], J = [];
+  for (var q = 0; q < 5; q++) { H.push(txt('h' + q)); J.push(txt('j' + q)); }
+  // Paso 5 (reto) = paso 4 + clase Postre + registros nuevos: se arma agregando líneas, sin modificar ninguna
+  H.push(txt('h5'));
+  J.push(J[4]
+    .replace('// js/4-polimorfismo.js', '// js/5-reto.js')
+    .replace('// El menú protege su colección', txt('j5-extra-postre') + '\n\n// El menú protege su colección')
+    .replace('  Bebida: "Mililitros",\n', '  Bebida: "Mililitros",\n  Postre: "Porción",\n')
+    .replace('  Bebida: ["350", "500", "1000"],\n', '  Bebida: ["350", "500", "1000"],\n  Postre: ["Individual", "Para compartir"],\n')
+    .replace('  Bebida: (nombre, precio, extra) => new Bebida(nombre, precio, Number(extra)),\n', '  Bebida: (nombre, precio, extra) => new Bebida(nombre, precio, Number(extra)),\n  Postre: (nombre, precio, extra) => new Postre(nombre, precio, extra),\n'));
+
+  var HEAD = '<!DOCTYPE html>\n<html lang="es">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>ComandaYa</title>\n  <link rel="stylesheet" href="css/estilos.css">\n</head>\n<body>\n';
+  function fullHtml(i) { return HEAD + H[i] + '\n</body>\n</html>'; }
+
+  /* ---------- diferencias línea a línea (LCS) ---------- */
+  function diff(prev, cur) {
+    var a = prev.split('\n'), b = cur.split('\n'), n = a.length, m = b.length, i, j;
+    var dp = []; for (i = 0; i <= n; i++) { dp.push(new Array(m + 1).fill(0)); }
+    for (i = n - 1; i >= 0; i--) for (j = m - 1; j >= 0; j--) dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    var isNew = new Array(m).fill(true); i = 0; j = 0;
+    while (i < n && j < m) {
+      if (a[i] === b[j]) { isNew[j] = false; i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++;
+    }
+    return { lines: b, isNew: isNew };
+  }
+  function pre(title, text, prevText) {
+    var lines, flags;
+    if (prevText == null) { lines = text.split('\n'); flags = lines.map(function () { return false; }); }
+    else { var d = diff(prevText, text); lines = d.lines; flags = d.isNew; }
+    return '<div class="codewrap"><div class="cap">' + title + '</div><pre><code>' + lines.map(function (t, k) {
+      return '<span class="l' + (flags[k] ? ' n' : '') + '">' + (esc(t) || ' ') + '</span>';
+    }).join('') + '</code></pre></div>';
+  }
+  function block(title, text, prevText) {
+    if (prevText != null && text === prevText) return '<details class="fold"><summary>' + title + ' (sin cambios en este paso)</summary>' + pre(title, text, null) + '</details>';
+    return pre(title, text, prevText);
+  }
+
+  /* ---------- pestañas de archivos ---------- */
+  function filesFor(ci) {
+    return [
+      { name: 'index.html', text: fullHtml(ci), prev: ci > 0 ? fullHtml(ci - 1) : null },
+      { name: 'css/estilos.css', text: CSS, prev: ci > 0 ? CSS : null },
+      { name: 'js/' + FILES[ci], text: J[ci], prev: ci > 0 ? J[ci - 1] : null }
+    ];
+  }
+  function tabsHtml(ci) {
+    var fs = filesFor(ci), def = ci === 0 ? 1 : 2;
+    var head = '<div class="tabs" role="tablist">' + fs.map(function (f, k) {
+      var changed = ci > 0 && f.text !== f.prev;
+      return '<button class="tab" role="tab" data-tab="' + k + '" aria-selected="' + (k === def) + '">' + f.name + (changed ? '<span class="dot" title="Cambia en este paso"></span>' : '') + '</button>';
+    }).join('') + '</div>';
+    var panels = fs.map(function (f, k) {
+      var cap = f.name + (ci > 0 && k === 2 ? ' · copia de js/' + FILES[ci - 1] + ' + líneas verdes' : '');
+      return '<div class="tabpanel" role="tabpanel" data-panel="' + k + '"' + (k === def ? '' : ' hidden') + '>' + block(cap, f.text, f.prev) + '</div>';
+    }).join('');
+    return { html: head + panels, files: fs, def: def };
+  }
+
+  /* ---------- consola de la vista previa ---------- */
+  function Log(el) { this.el = el; this.clear(); }
+  Log.prototype.clear = function () { this.el.innerHTML = '<div class="empty">Pulsa las pruebas en orden y mira aquí qué respondió tu código. La vista previa de la izquierda también se puede usar con el mouse.</div>'; };
+  Log.prototype.add = function (kind, src, msg) {
+    if ($('.empty', this.el)) this.el.innerHTML = '';
+    var d = document.createElement('div'); d.className = 'ln ' + kind;
+    d.innerHTML = '<span class="mk">' + (kind === 'ok' ? '✓' : '✗') + '</span><span><span class="src">' + esc(src) + '</span><br>' + esc(msg) + '</span>';
+    this.el.appendChild(d); this.el.scrollTop = this.el.scrollHeight;
+  };
+
+  /* ---------- vista previa: corre el código real del paso dentro de un Shadow DOM ---------- */
+  var NAMES = ['Plato', 'Hamburguesa', 'Pizza', 'Bebida', 'Postre', 'Menu', 'menu', 'platos', 'Orden', 'Restaurante', 'restaurante'];
+  function mount(host, i, log) {
+    host.innerHTML = '';
+    var box = document.createElement('div'); host.appendChild(box);
+    var sr = box.attachShadow({ mode: 'open' });
+    var css = CSS.replace(/:root/g, ':host').replace(/\bbody\b/g, ':host');
+    sr.innerHTML = '<style>:host{display:block}' + css + '</style>' + H[i].replace(/<script[\s\S]*?<\/script>/g, '');
+    var doc = {
+      getElementById: function (id) { return sr.getElementById(id); },
+      querySelector: function (s) { return sr.querySelector(s); },
+      querySelectorAll: function (s) { return sr.querySelectorAll(s); },
+      createElement: function (t) { return document.createElement(t); }
+    };
+    var ret = 'return {' + NAMES.map(function (n) { return n + ': (typeof ' + n + ' !== "undefined" ? ' + n + ' : undefined)'; }).join(',') + '};';
+    var ns = {};
+    try { ns = new Function('document', J[i] + '\n' + ret)(doc); }
+    catch (e) { log.add('err', 'Al cargar el código', e.name + ': ' + e.message); }
+    return { sr: sr, ns: ns };
+  }
+  // Los errores lanzados dentro de un addEventListener no llegan al que dispara el evento: se capturan aquí
+  function capture(fn) {
+    var err = null;
+    var h = function (ev) { err = ev.error || new Error(ev.message); ev.preventDefault(); };
+    window.addEventListener('error', h);
+    try { fn(); } finally { window.removeEventListener('error', h); }
+    if (err) throw err;
+  }
+  function U(pv) {
+    var g = function (id) { var e = pv.sr.getElementById(id); if (!e) throw new Error('No encontré #' + id + ' en la página de este paso'); return e; };
+    return {
+      set: function (id, v) { g(id).value = String(v); },
+      change: function (id) { g(id).dispatchEvent(new Event('change', { bubbles: true })); },
+      submit: function (id) { capture(function () { g(id).dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); }); },
+      click: function (sel, n) {
+        var list = pv.sr.querySelectorAll(sel); n = n || 0;
+        var b = list[n < 0 ? list.length + n : n];
+        if (!b) throw new Error('No encontré ' + sel + ' (¿falta hacer la prueba anterior?)');
+        capture(function () { b.click(); });
+      }
+    };
+  }
+  function pesosG(v) { return '$' + Number(v).toLocaleString('es-CO'); }
+  function runTest(t, pv, log) {
+    if (t.js) {
+      try { var r = t.js(pv.ns); log.add('ok', t.src, '→ ' + (typeof r === 'string' ? r : show(r))); }
+      catch (e) { log.add('err', t.src, e.name + ': ' + e.message); }
+      return;
+    }
+    var tt = pv.sr.getElementById('toast');
+    if (tt) { tt.textContent = ''; tt.className = ''; }
+    try {
+      var u = U(pv), extra;
+      if (t.form) {
+        var f = t.form;
+        u.set('tipo', f.tipo); u.change('tipo');
+        if (f.extra != null && pv.sr.getElementById('extra')) u.set('extra', f.extra);
+        u.set('nombre', f.nombre); u.set('precio', f.precio);
+        u.submit('formulario');
+      } else {
+        extra = t.ui(u, pv.ns);
+      }
+      var bad = tt && /error/.test(tt.className);
+      var msg = (tt && tt.textContent) || '';
+      if (extra) msg = msg ? msg + ' · ' + extra : extra;
+      log.add(bad ? 'err' : 'ok', t.label, msg || '(sin mensaje)');
+    } catch (e) { log.add('err', t.label, e.name + ': ' + e.message); }
+  }
+
+  /* ---------- diagrama de clases UML (SVG) ---------- */
+  var UW = 165, LH = 15;
+  function kid(n, x, a, m) { return { n: n, r: 1, x: x, p: 'Plato', a: a, m: m }; }
+  var M1 = ['+ icono()'];
+  var M3 = ['+ icono()', '+ valorExtra()', '+ describir()', '+ actualizar(datos)'];
+  var M4 = M3.concat(['+ calcularPrecio()', '+ tiempoPreparacion()']);
+  var PLATO2 = { a: ['- static #contador', '- #id', '- #precio', '+ nombre'], m: ['+ get id()', '+ get/set precio', '*+ icono()'] };
+  var PLATO3m = ['+ get id()', '+ get/set precio', '+ describir()', '+ actualizar(datos)', '*+ icono()', '*+ valorExtra()'];
+  var PLATO4m = PLATO3m.concat(['*+ calcularPrecio()', '*+ tiempoPreparacion()']);
+  var MENU = { n: 'Menu', r: 0, x: 10, a: ['- #platos: Map'], m: ['+ agregar(plato)', '+ buscar(id)', '+ actualizar(id, datos)', '+ eliminar(id)', '+ get platos()'] };
+  var REST = { n: 'Restaurante', r: 0, x: 10, a: ['- #ordenes: Map'], m: ['+ abrirOrden(mesa)', '+ buscar(id)', '+ cancelar(id)', '+ get ordenes()', '+ ventasDelDia()'] };
+  var ORDEN = { n: 'Orden', r: 0, x: 210, a: ['+ static ESTADOS', '- static #contador', '- #id', '- #mesa', '- #items', '- #paso'], m: ['+ get estado()', '+ get items()', '+ agregar(plato)', '+ quitar(indice)', '+ avanzar()', '+ total()', '+ tiempo()'] };
+  var UML = [
+    { cls: [], rel: [] },
+    { cls: [{ n: 'Plato', abs: 1, r: 0, x: 318, a: ['+ nombre', '+ precio'], m: ['*+ icono()'] },
+      kid('Hamburguesa', 60, [], M1), kid('Pizza', 318, [], M1), kid('Bebida', 576, [], M1)], rel: [] },
+    { cls: [MENU, { n: 'Plato', abs: 1, r: 0, x: 318, a: PLATO2.a, m: PLATO2.m },
+      kid('Hamburguesa', 60, [], M1), kid('Pizza', 318, [], M1), kid('Bebida', 576, [], M1)],
+      rel: [{ f: 'Menu', t: 'Plato', k: 'comp', m: '0..*' }] },
+    { cls: [MENU, { n: 'Plato', abs: 1, r: 0, x: 318, a: PLATO2.a, m: PLATO3m },
+      kid('Hamburguesa', 60, ['+ carnes'], M3), kid('Pizza', 318, ['+ tamano'], M3), kid('Bebida', 576, ['+ ml'], M3)],
+      rel: [{ f: 'Menu', t: 'Plato', k: 'comp', m: '0..*' }] },
+    { cls: [REST, ORDEN, { n: 'Plato', abs: 1, r: 0, x: 410, a: PLATO2.a, m: PLATO4m }, Object.assign({}, MENU, { x: 610 }),
+      kid('Hamburguesa', 110, ['+ carnes'], M4), kid('Pizza', 318, ['+ static RECARGO', '+ tamano'], M4), kid('Bebida', 526, ['+ static RECARGO', '+ ml'], M4)],
+      rel: [{ f: 'Restaurante', t: 'Orden', k: 'comp', m: '0..*' }, { f: 'Orden', t: 'Plato', k: 'agg', m: '0..*' }, { f: 'Menu', t: 'Plato', k: 'comp', m: '0..*' }] }
+  ];
+  UML.push({ cls: UML[4].cls.slice(0, 4).concat([
+      kid('Hamburguesa', 10, ['+ carnes'], M4), kid('Pizza', 210, ['+ static RECARGO', '+ tamano'], M4), kid('Bebida', 410, ['+ static RECARGO', '+ ml'], M4), kid('Postre', 610, ['+ porcion'], M4)]),
+    rel: UML[4].rel });
+  var DESC = {
+    Plato: 'Clase <b>abstracta</b>: reúne lo que todo plato tiene (nombre, id, precio validado) y define el <em>contrato</em> que cada tipo debe cumplir. <code>new Plato()</code> lanza un error. En cursiva van ella y sus métodos abstractos.',
+    Hamburguesa: 'Hija de <code>Plato</code> (herencia). Reutiliza el id y el precio validado del padre con <code>super</code> y aporta su dato propio: las carnes. Responde a su manera a <code>calcularPrecio()</code>: cada carne extra suma $4.000.',
+    Pizza: 'Hija de <code>Plato</code>. Aporta su tamaño y un <code>RECARGO</code> estático compartido por todas las pizzas. Su precio final depende del tamaño.',
+    Bebida: 'Hija de <code>Plato</code>. Aporta los mililitros; su recargo depende del tamaño del vaso. Es la más rápida de preparar: 2 minutos.',
+    Postre: 'La clase del reto. Se agrega <b>sin modificar</b> el código que ya funcionaba: hereda de <code>Plato</code>, cumple el contrato y el resto del sistema la usa sin saber que existe.',
+    Menu: 'Encapsula la colección de platos en un <code>Map</code> privado. Es la única puerta del <b>CRUD</b>: agregar, buscar, actualizar y eliminar. El rombo relleno es <b>composición</b>: el menú es dueño de sus platos.',
+    Orden: 'Agrupa los platos de una mesa. El rombo vacío es <b>agregación</b>: los platos existen aunque la orden se cancele. Protege su estado: solo admite platos mientras está Pendiente y solo avanza de uno en uno.',
+    Restaurante: 'Compone las órdenes: las abre, las busca y las cancela (CRUD de órdenes). <code>ventasDelDia()</code> suma totales sin preguntar nunca de qué tipo es cada plato.'
+  };
+  function umlLayout(D) {
+    var cls = D.cls.map(function (c) {
+      var hh = 26 + (c.abs ? 12 : 0), ah = 8 + c.a.length * LH, mh = 8 + c.m.length * LH;
+      return Object.assign({}, c, { hh: hh, ah: ah, mh: mh, h: hh + ah + mh });
+    });
+    var rowH = [0, 0]; cls.forEach(function (c) { rowH[c.r] = Math.max(rowH[c.r], c.h); });
+    var y1 = 10 + rowH[0] + 58;
+    cls.forEach(function (c) { c.y = c.r === 0 ? 10 : y1; });
+    return { cls: cls, H: (rowH[1] ? y1 + rowH[1] : 10 + rowH[0]) + 12 };
+  }
+  function prevMap(ci) { var p = {}; if (ci > 0) UML[ci - 1].cls.forEach(function (c) { p[c.n] = c; }); return p; }
+  function memberText(t, x, y, extraCls) {
+    var abs = t.charAt(0) === '*'; if (abs) t = t.slice(1);
+    return '<text x="' + x + '" y="' + y + '"' + (abs || extraCls ? ' class="' + (abs ? 'abs ' : '') + (extraCls || '') + '"' : '') + '>' + esc(t) + '</text>';
+  }
+  function umlSvg(ci) {
+    var D = UML[ci], prev = prevMap(ci), L = umlLayout(D), by = {};
+    L.cls.forEach(function (c) { by[c.n] = c; });
+    var s = '<svg class="uml" viewBox="0 0 800 ' + L.H + '" role="img" aria-label="Diagrama de clases del paso ' + ci + '">' +
+      '<defs>' +
+      '<marker id="mk-inh" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="14" markerHeight="14" orient="auto" markerUnits="userSpaceOnUse"><path class="mk-hollow" d="M1,1 L11,6 L1,11 Z"/></marker>' +
+      '<marker id="mk-comp" viewBox="0 0 16 12" refX="1" refY="6" markerWidth="16" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse"><path class="mk-solid" d="M1,6 L8,1 L15,6 L8,11 Z"/></marker>' +
+      '<marker id="mk-agg" viewBox="0 0 16 12" refX="1" refY="6" markerWidth="16" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse"><path class="mk-hollow" d="M1,6 L8,1 L15,6 L8,11 Z"/></marker>' +
+      '</defs>';
+    L.cls.forEach(function (c) {
+      if (!c.p) return;
+      var p = by[c.p], cx = c.x + UW / 2, px = p.x + UW / 2, pb = p.y + p.h, mid = Math.round((pb + c.y) / 2) + 8;
+      s += '<path class="rel" d="M' + cx + ',' + c.y + ' V' + mid + ' H' + px + ' V' + pb + '" marker-end="url(#mk-inh)"/>';
+    });
+    D.rel.forEach(function (r) {
+      var a = by[r.f], b = by[r.t], y = a.y + 14, ltr = a.x < b.x;
+      var x1 = ltr ? a.x + UW : a.x, x2 = ltr ? b.x : b.x + UW;
+      s += '<path class="rel" d="M' + x1 + ',' + y + ' H' + x2 + '" marker-start="url(#mk-' + r.k + ')"/>';
+      s += '<text class="mult" x="' + (x2 + (ltr ? -4 : 4)) + '" y="' + (y - 5) + '" text-anchor="' + (ltr ? 'end' : 'start') + '">' + r.m + '</text>';
+    });
+    L.cls.forEach(function (c, idx) {
+      var isNew = !prev[c.n], pm = prev[c.n] ? prev[c.n].a.concat(prev[c.n].m) : [];
+      var g = '<g class="cls' + (isNew ? ' nuevo' : '') + '" data-cls="' + c.n + '" tabindex="0" role="button" aria-label="Clase ' + c.n + '"' + (isNew ? ' style="animation-delay:' + (idx * 0.07).toFixed(2) + 's"' : '') + '>';
+      g += '<rect class="box' + (isNew ? ' nuevo' : '') + '" x="' + c.x + '" y="' + c.y + '" width="' + UW + '" height="' + c.h + '" rx="6"/>';
+      g += '<rect class="head" x="' + (c.x + 1.5) + '" y="' + (c.y + 1.5) + '" width="' + (UW - 3) + '" height="' + (c.hh - 2) + '" rx="5"/>';
+      if (c.abs) g += '<text class="stereo" x="' + (c.x + UW / 2) + '" y="' + (c.y + 14) + '" text-anchor="middle">«abstracta»</text>';
+      g += '<text class="cname' + (c.abs ? ' abs' : '') + '" x="' + (c.x + UW / 2) + '" y="' + (c.y + (c.abs ? 29 : 18)) + '" text-anchor="middle">' + c.n + '</text>';
+      g += '<line class="sep" x1="' + c.x + '" x2="' + (c.x + UW) + '" y1="' + (c.y + c.hh) + '" y2="' + (c.y + c.hh) + '"/>';
+      g += '<line class="sep" x1="' + c.x + '" x2="' + (c.x + UW) + '" y1="' + (c.y + c.hh + c.ah) + '" y2="' + (c.y + c.hh + c.ah) + '"/>';
+      var lines = c.a.map(function (t) { return [t, c.y + c.hh]; }).concat(c.m.map(function (t) { return [t, c.y + c.hh + c.ah]; }));
+      var ia = 0, im = 0;
+      lines.forEach(function (pair, k) {
+        var isAttr = k < c.a.length, row = isAttr ? ia++ : im++;
+        var ty = pair[1] + 4 + row * LH + 11;
+        if (!isNew && pm.indexOf(pair[0]) < 0) g += '<rect class="mnew" x="' + (c.x + 2) + '" y="' + (ty - 11) + '" width="' + (UW - 4) + '" height="' + (LH - 1) + '" rx="2"/>';
+        g += memberText(pair[0], c.x + 8, ty);
+      });
+      s += g + '</g>';
+    });
+    return s + '</svg>';
+  }
+  function umlInfo(ci, name) {
+    var c = UML[ci].cls.filter(function (x) { return x.n === name; })[0], prev = prevMap(ci);
+    var news = prev[name] ? c.a.concat(c.m).filter(function (t) { return prev[name].a.concat(prev[name].m).indexOf(t) < 0; }) : null;
+    return '<div><b>' + name + '</b> ' + (c.abs ? '<span class="chip">abstracta</span>' : '') + (news === null ? ' <span class="chip">nueva en este paso</span>' : '') + '</div>' +
+      '<p>' + DESC[name] + '</p>' +
+      (news && news.length ? '<p class="note">Nuevo en este paso: ' + news.map(function (t) { return '<code>' + esc(t.replace(/^\*/, '')) + '</code>'; }).join(' ') + '</p>' : '') +
+      '<div class="row"><button class="act" data-goto="' + name + '">Ver la clase en el código →</button></div>';
+  }
+
+  /* ---------- convención de commits ---------- */
+  var TIPOS = [
+    ['feat', 'Agregas una funcionalidad nueva que se nota al usar la app.', 'feat(menu): editar y eliminar platos con Menu'],
+    ['fix', 'Corriges un <b>bug</b>: algo que funcionaba mal.', 'fix(precio): rechazar precios negativos o en cero'],
+    ['docs', 'Solo cambias documentación: README o comentarios.', 'docs: agregar README con diagrama de clases'],
+    ['style', 'Cambias formato o estilos sin tocar la lógica: CSS, espacios, sangría.', 'style: paleta de colores y animaciones'],
+    ['refactor', 'Reorganizas el código sin cambiar lo que hace.', 'refactor: reemplazar if/else por fabricas'],
+    ['test', 'Agregas o corriges pruebas.', 'test: verificar que Orden vacia no avance'],
+    ['perf', 'Mejoras el rendimiento.', 'perf: redibujar solo la tarjeta que cambio'],
+    ['chore', 'Mantenimiento que no cambia la app: configuración, .gitignore, carpetas.', 'chore: agregar .gitignore'],
+    ['build / ci', 'Herramientas de construcción, dependencias o automatización (por ejemplo, GitHub Actions).', 'ci: publicar en GitHub Pages con Actions'],
+    ['revert', 'Deshaces un commit anterior (Git lo propone con <code>git revert</code>).', 'revert: feat(menu): editar y eliminar platos']
+  ];
+  var TIPO_CORTO = {}; TIPOS.forEach(function (t) { TIPO_CORTO[t[0]] = t[1]; });
+  var QUIZ = [
+    { q: 'Agregaste el botón «Cancelar» a cada orden del tablero.', a: 'feat', why: 'es algo nuevo que el usuario puede usar.' },
+    { q: 'El total sumaba mal las pizzas familiares y lo corregiste.', a: 'fix', why: 'era un bug. No existe el tipo <code>bug:</code>; los bugs se registran con <code>fix:</code>.' },
+    { q: 'Cambiaste el color de los botones y la velocidad de la animación de entrada.', a: 'style', why: 'solo cambia cómo se ve, no lo que hace.' },
+    { q: 'Moviste la creación de platos al objeto fabricas; la app hace exactamente lo mismo.', a: 'refactor', why: 'reorganizaste el código sin cambiar su comportamiento.' },
+    { q: 'Escribiste en el README cómo ejecutar el proyecto.', a: 'docs', why: 'solo tocaste documentación.' },
+    { q: 'Agregaste un .gitignore para no subir la carpeta .vscode.', a: 'chore', why: 'es mantenimiento del repositorio: la app no cambia.' }
+  ];
+  var QOPTS = ['feat', 'fix', 'style', 'refactor', 'docs', 'chore'];
+  function chip(t) { return '<span class="chip ' + t.split(' ')[0] + '">' + t + '</span>'; }
+
+  var COMMITS_HTML =
+    '<h3>La forma de un buen mensaje</h3>' +
+    '<div class="anat"><span class="t"><small>tipo</small><b>feat</b></span><span><small>alcance (opcional)</small>(menu)</span><span><small>dos puntos y espacio</small>:&nbsp;</span><span><small>descripción corta</small>editar y eliminar platos</span></div>' +
+    '<p class="note">Esta convención se llama <b>Conventional Commits</b> y la usan miles de proyectos. El <em>tipo</em> dice qué clase de cambio es; el <em>alcance</em> dice en qué parte del proyecto (menu, ordenes, precio...); la <em>descripción</em> dice qué hiciste.</p>' +
+    '<h3>Las categorías</h3><div class="tablewrap"><table class="tipos"><thead><tr><th>Tipo</th><th>Cuándo usarlo</th><th>Ejemplo en ComandaYa</th></tr></thead><tbody>' +
+    TIPOS.map(function (t) { return '<tr><td>' + chip(t[0]) + '</td><td>' + t[1] + '</td><td><code>' + esc(t[2]) + '</code></td></tr>'; }).join('') +
+    '</tbody></table></div>' +
+    '<div class="callout"><b>¿Y los bugs?</b> No existe el tipo <code>bug:</code>. Cuando corriges un error usas <code>fix:</code>. Si quieres, en el cuerpo del commit explicas cuál era el bug: <code>git commit -m "fix(precio): rechazar precios negativos" -m "Antes se aceptaba -100 al crear un plato"</code>.</div>' +
+    '<h3>Reglas para el título</h3><ol class="todo">' +
+    '<li>Tipo en <b>minúsculas</b>, seguido de dos puntos y un espacio.</li>' +
+    '<li>Descripción en <b>infinitivo</b> y corta: «agregar», «corregir», «mover»; no «agregué» ni «cambios».</li>' +
+    '<li><b>Sin punto final</b> y de unos <b>50 caracteres</b> como máximo.</li>' +
+    '<li><b>Sin tildes ni eñes</b> en el mensaje: evitas problemas de codificación en algunas terminales de Windows.</li>' +
+    '<li><b>Un commit = un cambio lógico.</b> Si tu mensaje necesita un «y además», probablemente son dos commits.</li>' +
+    '<li>Para un cambio incompatible (algo que rompe lo que otros usaban) agrega <code>!</code>: <code>feat(menu)!: cambiar el formato de los ids</code>.</li>' +
+    '</ol>' +
+    '<div class="compare"><div class="mal"><h3>Así no</h3><ul><li><code>cambios</code></li><li><code>listo</code></li><li><code>arreglé cosas</code></li><li><code>Bug: El Precio.</code></li><li><code>feat: hice el menu, las ordenes y el css</code></li></ul></div>' +
+    '<div class="bien"><h3>Así sí</h3><ul><li><code>feat(ordenes): avanzar el estado de una orden</code></li><li><code>fix(precio): rechazar precios negativos o en cero</code></li><li><code>style: animacion de salida al eliminar un plato</code></li><li><code>refactor: reemplazar if/else por fabricas</code></li><li><code>docs: agregar README con diagrama de clases</code></li></ul></div></div>' +
+    '<h3>Practica: ¿qué tipo le pondrías?</h3><div class="quiz">' +
+    QUIZ.map(function (it, k) {
+      return '<div class="qitem" data-q="' + k + '"><div>' + (k + 1) + '. ' + it.q + '</div><div class="opts">' +
+        QOPTS.map(function (o) { return '<button type="button" data-o="' + o + '">' + o + '</button>'; }).join('') +
+        '</div><div class="qfb" aria-live="polite"></div></div>';
+    }).join('') + '<div class="qscore" data-score>Aciertos: 0 de ' + QUIZ.length + '</div></div>';
+
+  function bindQuiz(root) {
+    var good = {};
+    $$('.qitem', root).forEach(function (q) {
+      var it = QUIZ[q.dataset.q];
+      $$('button', q).forEach(function (b) {
+        b.onclick = function () {
+          $$('button', q).forEach(function (x) { x.classList.remove('ok', 'no'); });
+          var ok = b.dataset.o === it.a;
+          b.classList.add(ok ? 'ok' : 'no');
+          good[q.dataset.q] = ok;
+          $('.qfb', q).innerHTML = ok ? '✓ Correcto: <code>' + it.a + '</code>, porque ' + it.why : '✗ <code>' + b.dataset.o + '</code> no encaja. Pista: ' + TIPO_CORTO[it.a];
+          var n = Object.keys(good).filter(function (k) { return good[k]; }).length;
+          $('[data-score]', root).textContent = 'Aciertos: ' + n + ' de ' + QUIZ.length + (n === QUIZ.length ? ' · ¡Dominas los tipos de commit! 🎉' : '');
+        };
+      });
+    });
+  }
+
+  /* ---------- contenido de los pasos ---------- */
+  var STEPS = [
+    {
+      tag: 'Base', titulo: 'Prepara la página del restaurante',
+      logro: 'La página con el formulario de platos, el menú vacío y los estilos con todas las animaciones. Todavía sin clases: solo comprobamos que los tres archivos están conectados.',
+      concepto: '<b>Tres archivos, tres responsabilidades.</b> <code>index.html</code> da la estructura, <code>css/estilos.css</code> el aspecto y las animaciones, y la carpeta <code>js/</code> el comportamiento. En cada paso crearás un archivo JS nuevo (una copia del anterior más lo nuevo) y en <code>index.html</code> cambiarás la línea <code>&lt;script src&gt;</code> para usarlo. Así conservas cada versión y ves cómo creció el código.',
+      pasos: ['Dentro de la carpeta <code>comanda-ya</code> que clonaste, crea las carpetas <code>css</code> y <code>js</code> (si no lo hiciste en «Antes de empezar»).', 'Crea <code>css/estilos.css</code> (pestaña <b>css/estilos.css</b>). No cambia en toda la guía: ya trae las animaciones <code>entra</code>, <code>brilla</code>, <code>sale</code>, <code>llega</code> y <code>sacudir</code> que usarás después.', 'Crea <code>index.html</code> (pestaña <b>index.html</b>). Fíjate en la línea del final: <code>&lt;script src="js/0-base.js"&gt;</code>.', 'Crea <code>js/0-base.js</code> y abre <code>index.html</code> en el navegador (doble clic o la extensión Live Server de VS Code).', 'Escribe un nombre y un precio y pulsa <b>Agregar al menú</b>: el mensaje debe aparecer con una animación.'],
+      checks: ['Veo la página con sus colores y el formulario', 'Al pulsar el botón aparece el mensaje animado'],
+      pensar: ['¿Por qué el <code>&lt;script&gt;</code> va al final del <code>&lt;body&gt;</code> y no en el <code>&lt;head&gt;</code>?', 'Porque el navegador lee el HTML de arriba hacia abajo. Si el script corre antes de que exista <code>#formulario</code>, <code>getElementById</code> devuelve <code>null</code> y el código falla. Al final del body todos los elementos ya existen. Otra opción es dejarlo en el head con <code>&lt;script defer&gt;</code>.'],
+      pruebas: [{ label: 'Enviar el formulario', form: { tipo: 'Hamburguesa', nombre: 'Clásica', precio: 18000 } }]
+    },
+    {
+      tag: 'Abstracción', titulo: 'Un plato que nadie puede pedir',
+      logro: 'Crear y listar platos (la <b>C</b> y la <b>R</b> del CRUD) en tarjetas animadas, sobre una clase abstracta <code>Plato</code>.',
+      concepto: '<b>Abstracción: quedarse con lo esencial.</b> Ningún cliente pide «un plato» a secas: pide una hamburguesa, una pizza o una bebida. Por eso <code>Plato</code> no se puede instanciar (<code>new.target</code> lo impide) y solo define el <em>contrato</em>: todo plato tiene nombre, precio y un ícono, y cada tipo decide cuál es su ícono.',
+      pasos: ['Crea <code>js/1-abstraccion.js</code> y en <code>index.html</code> cambia el <code>src</code> del script por ese archivo.', 'Escribe <code>Plato</code> con la revisión de <code>new.target</code> y el método <code>icono()</code>, que lanza un error si una hija no lo implementa.', 'Crea <code>Hamburguesa</code>, <code>Pizza</code> y <code>Bebida</code> con <code>extends Plato</code> y su propio <code>icono()</code>.', 'Conecta con la página: <code>dibujar()</code> pinta una tarjeta por plato y el formulario crea el plato según el tipo elegido.', 'Mira la animación: solo la tarjeta nueva entra con rebote, gracias a la variable <code>animar</code> y la clase CSS <code>entra</code>. Pasa el mouse sobre una tarjeta: el ícono gira.'],
+      nota: 'Hay dos errores a propósito: el precio -100 se acepta y cualquiera puede meter basura en el arreglo <code>platos</code>. Los arreglamos en el paso 2.',
+      checks: ['Creo una hamburguesa, una pizza y una bebida, y cada una muestra su ícono', 'Entiendo por qué <code>new Plato()</code> lanza un error'],
+      pensar: ['Si creas <code>class Postre extends Plato {}</code> sin <code>icono()</code>, ¿cuándo falla?', 'No falla al crearlo: falla cuando <code>dibujar()</code> llama a <code>p.icono()</code>, porque se ejecuta el método del padre, que lanza «Postre debe implementar icono()». El contrato te avisa con un mensaje claro qué te falta.'],
+      pruebas: [
+        { label: 'Hamburguesa Clásica $18.000', form: { tipo: 'Hamburguesa', nombre: 'Clásica', precio: 18000 } },
+        { label: 'Pizza Hawaiana $20.000', form: { tipo: 'Pizza', nombre: 'Hawaiana', precio: 20000 } },
+        { label: 'Bebida con precio -100 (se acepta: es el error del paso)', form: { tipo: 'Bebida', nombre: 'Agua fantasma', precio: -100 } },
+        { label: 'new Plato("Misterio", 1000)', src: 'new Plato("Misterio", 1000)', js: function (ns) { return new ns.Plato('Misterio', 1000); } },
+        { label: 'platos.push("intruso") (también se deja)', src: 'platos.push("intruso")', js: function (ns) { ns.platos.push('intruso'); return 'ahora hay ' + ns.platos.length + ' «platos». Crea otro plato y mira qué pasa al dibujar.'; } }
+      ]
+    },
+    {
+      tag: 'Encapsulamiento', titulo: 'Proteger el precio y completar el CRUD',
+      logro: 'Completar el CRUD: <b>editar</b> y <b>eliminar</b> platos, con un precio que nunca queda inválido y una colección que nadie altera desde afuera.',
+      concepto: '<b>Encapsulamiento: el dato adentro y un portero que decide.</b> <code>#precio</code> y <code>#id</code> son privados: el precio solo cambia con <code>set precio</code>, que valida, y el <code>id</code> es de solo lectura. <code>Menu</code> guarda sus platos en un <code>Map</code> privado y es la única puerta del CRUD: <code>agregar</code>, <code>buscar</code>, <code>actualizar</code> y <code>eliminar</code>. Su getter <code>platos</code> entrega una <em>copia</em>.',
+      pasos: ['Crea <code>js/2-encapsulamiento.js</code> copiando el anterior, cambia el <code>src</code> en <code>index.html</code> y agrega el botón <b>Cancelar</b> al formulario.', 'En <code>Plato</code> agrega <code>static #contador</code>, <code>#id</code>, <code>#precio</code>, el <code>get id</code> y el par <code>get</code>/<code>set precio</code> que lanza <code>RangeError</code>. <b>Aquí haces el primer commit del paso (un <code>fix</code>).</b>', 'Crea la clase <code>Menu</code> con el <code>Map</code> privado y sus métodos, y reemplaza el arreglo <code>platos</code> por <code>const menu = new Menu()</code>.', 'Agrega a cada tarjeta los botones <b>Editar</b> (carga el plato en el formulario, que se pone verde) y <b>Eliminar</b> (pide confirmación con un segundo clic y la tarjeta sale animada).', 'Envuelve el guardado en <code>try / catch</code>: los errores aparecen en rojo y el mensaje se sacude.'],
+      nota: 'Después del punto 2 el precio inválido ya se rechaza, aunque el error solo se ve en la consola del navegador (F12). El mensaje rojo llega con el <code>try / catch</code> del punto 5.',
+      checks: ['El precio -100 se rechaza con un mensaje rojo que se sacude', 'Edito un plato, lo elimino, y entiendo por qué <code>menu.platos</code> devuelve una copia'],
+      pensar: ['¿Por qué <code>Menu.actualizar()</code> cambia primero el precio y después el nombre?', 'Porque si el precio es inválido, el setter lanza el error y el método se detiene antes de tocar el nombre. Así el plato nunca queda «a medio editar»: se aplican todos los cambios o ninguno.'],
+      pruebas: [
+        { label: 'Hamburguesa con precio -100 (ahora se rechaza)', form: { tipo: 'Hamburguesa', nombre: 'Fantasma', precio: -100 } },
+        { label: 'Pizza Margarita $20.000', form: { tipo: 'Pizza', nombre: 'Margarita', precio: 20000 } },
+        { label: 'Editar la última tarjeta con precio 0', ui: function (u, ns) { u.click('.editar', -1); u.set('precio', 0); u.submit('formulario'); var p = ns.menu.platos.slice(-1)[0]; return 'precio guardado: ' + pesosG(p.precio) + ' (no cambió)'; } },
+        { label: 'Editar la última: Margarita XL $26.000', ui: function (u) { u.click('.editar', -1); u.set('nombre', 'Margarita XL'); u.set('precio', 26000); u.submit('formulario'); } },
+        { label: 'Eliminar la última (1.er clic: confirmar)', ui: function (u, ns) { u.click('.eliminar', -1); return 'el botón ahora dice «¿Seguro?»; quedan ' + ns.menu.platos.length + ' platos'; } },
+        { label: 'Eliminar la última (2.º clic: elimina)', ui: function (u, ns) { u.click('.eliminar', -1); return 'quedan ' + ns.menu.platos.length + ' platos'; } },
+        { label: 'menu.platos.push("intruso")', src: 'menu.platos.push("intruso")', js: function (ns) { var a = ns.menu.platos.length; ns.menu.platos.push('intruso'); return 'antes: ' + a + ' platos, después: ' + ns.menu.platos.length + ' (la colección original no cambió)'; } },
+        { label: 'Object.keys(plato)', src: 'Object.keys(new Pizza("Test", 1000))', js: function (ns) { return Object.keys(new ns.Pizza('Test', 1000)).join(', ') + '  ← #id y #precio no se ven desde afuera'; } }
+      ]
+    },
+    {
+      tag: 'Herencia', titulo: 'Cada plato con lo suyo',
+      logro: 'Cada tipo de plato con su dato propio (carnes, tamaño, mililitros), que se crea y también se <b>edita</b>, reutilizando todo lo que <code>Plato</code> ya sabe hacer.',
+      concepto: '<b>Herencia: la hija parte del padre y agrega solo lo suyo.</b> <code>super(nombre, precio)</code> construye primero la parte <code>Plato</code> (con su <code>#id</code> y su precio validado). <code>super.describir()</code> y <code>super.actualizar()</code> reutilizan lo común, y la hija solo añade su dato. Regla práctica: si la hija «es un tipo de» padre, hereda.',
+      pasos: ['Crea <code>js/3-herencia.js</code>, cambia el <code>src</code> y agrega al formulario el campo <code>extra</code> con su etiqueta.', 'En <code>Plato</code> agrega <code>describir()</code>, <code>actualizar(datos)</code> y el contrato <code>valorExtra()</code>. <code>Menu.actualizar()</code> ahora le pide al plato que se actualice.', 'En cada hija escribe el constructor con <code>super(...)</code> y su atributo propio, y sobrescribe <code>describir()</code> y <code>actualizar()</code> usando <code>super</code>.', 'Usa <code>ETIQUETAS</code> y <code>OPCIONES</code> para que el campo extra cambie con el tipo (<code>prepararExtra()</code>).', 'Reemplaza el <code>if / else</code> por el objeto <code>fabricas</code>: un tipo, una función que crea el plato.'],
+      checks: ['Creo una pizza familiar y la tarjeta muestra su tamaño', 'Edito una hamburguesa, le cambio las carnes e identifico dónde se usa <code>super</code>'],
+      pensar: ['¿Por qué <code>super(...)</code> va antes de <code>this.carnes = carnes</code>?', 'Porque <code>this</code> no existe hasta que el constructor del padre lo crea. Si lo usas antes de <code>super</code>, JavaScript lanza <code>ReferenceError</code>. Además, así el precio se valida antes de guardar nada propio.'],
+      pruebas: [
+        { label: 'Hamburguesa Doble $18.000 · 2 carnes', form: { tipo: 'Hamburguesa', nombre: 'Doble', precio: 18000, extra: '2' } },
+        { label: 'Pizza Pepperoni $22.000 · Familiar', form: { tipo: 'Pizza', nombre: 'Pepperoni', precio: 22000, extra: 'Familiar' } },
+        { label: 'Bebida Jugo de mango $6.000 · 500 ml', form: { tipo: 'Bebida', nombre: 'Jugo de mango', precio: 6000, extra: '500' } },
+        { label: 'Editar la primera: 3 carnes', ui: function (u, ns) { u.click('.editar', 0); u.set('extra', '3'); u.submit('formulario'); return ns.menu.platos[0].describir(); } },
+        { label: 'new Pizza(...) instanceof Plato', src: 'new Pizza("Test", 1000, "Mediana") instanceof Plato', js: function (ns) { return new ns.Pizza('Test', 1000, 'Mediana') instanceof ns.Plato; } }
+      ]
+    },
+    {
+      tag: 'Polimorfismo', titulo: 'Misma orden, distinta respuesta',
+      logro: 'El tablero de comandas: abrir órdenes por mesa, pedir y quitar platos, avanzarlas de columna en columna, cancelarlas y ver las ventas del día subir animadas. Todo se calcula sin preguntar nunca de qué tipo es cada plato.',
+      concepto: '<b>Polimorfismo: la misma orden, distinta respuesta.</b> <code>calcularPrecio()</code> y <code>tiempoPreparacion()</code> existen en todos los platos, pero cada tipo los resuelve a su manera: carnes extra, recargo por tamaño, por mililitros. <code>Orden.total()</code>, <code>Restaurante.ventasDelDia()</code> y <code>dibujar()</code> solo hacen la llamada; no usan <code>if</code> por tipo ni <code>instanceof</code>.',
+      pasos: ['Crea <code>js/4-polimorfismo.js</code>, cambia el <code>src</code> y agrega al HTML la sección <b>Comandas</b>: formulario de mesa, tablero y ventas.', 'Agrega al contrato de <code>Plato</code> los métodos <code>calcularPrecio()</code> y <code>tiempoPreparacion()</code>, e impleméntalos en cada hija.', 'Crea <code>Orden</code> con <code>#items</code> y <code>#paso</code>: solo admite platos mientras está Pendiente y su estado avanza de uno en uno.', 'Crea <code>Restaurante</code> con el CRUD de órdenes y <code>ventasDelDia()</code>.', 'Dibuja el tablero con <code>dibujarOrdenes()</code>, agrega el botón <b>＋ Pedir</b> a cada plato y anima las ventas con <code>animarNumero()</code>. Mira cómo la orden «llega» deslizándose a cada columna.'],
+      nota: 'Al final del archivo hay tres platos de ejemplo para no escribirlos cada vez. Precios esperados: Clásica con 2 carnes $22.000, Hawaiana familiar $36.000 y Limonada de 1 L $8.000.',
+      checks: ['El total de la orden y las ventas del día suman bien hamburguesa, pizza y bebida', 'Encuentro que <code>total()</code>, <code>ventasDelDia()</code> y <code>dibujar()</code> no usan <code>if</code> por tipo ni <code>instanceof</code>'],
+      pensar: ['Si mañana llega un <code>Postre</code>, ¿qué funciones tendrías que modificar para que el total lo incluya?', 'Ninguna: ni <code>total()</code>, ni <code>ventasDelDia()</code>, ni <code>dibujar()</code>, ni <code>dibujarOrdenes()</code>. Solo crearías la clase con su <code>calcularPrecio()</code>. Lo compruebas en el reto.'],
+      pruebas: [
+        { label: '1 · Abrir orden para la mesa 4', ui: function (u) { u.set('mesa', 4); u.submit('form-orden'); } },
+        { label: '2 · Pedir Clásica + Hawaiana + Limonada (esperado $66.000)', ui: function (u, ns) { u.click('.pedir', 0); u.click('.pedir', 1); u.click('.pedir', 2); var o = ns.restaurante.ordenes.slice(-1)[0]; return 'orden.total() → ' + pesosG(o.total()) + ' · tiempo ' + o.tiempo() + ' min'; } },
+        { label: '3 · Avanzar ▶ (a «En cocina»)', ui: function (u) { u.click('.orden.activa .avanzar'); } },
+        { label: '4 · Quitar un plato estando en cocina (error)', ui: function (u) { u.click('.orden.activa .quitar', 0); } },
+        { label: '5 · Avanzar dos veces más (hasta «Entregada»)', ui: function (u) { u.click('.orden.activa .avanzar'); u.click('.orden.activa .avanzar'); } },
+        { label: '6 · Avanzar otra vez (error)', ui: function (u) { u.click('.orden.activa .avanzar'); } },
+        { label: 'restaurante.ventasDelDia()', src: 'restaurante.ventasDelDia()', js: function (ns) { return ns.restaurante.ventasDelDia(); } },
+        { label: 'new Orden(0)', src: 'new Orden(0)', js: function (ns) { return new ns.Orden(0); } }
+      ]
+    },
+    {
+      tag: 'Reto', titulo: 'Llega el postre',
+      logro: 'Agregar <code>Postre</code> al menú y a las comandas sin tocar <code>dibujar()</code>, <code>dibujarOrdenes()</code> ni <code>total()</code>.',
+      concepto: '<b>La prueba de fuego.</b> Si los cuatro pilares están bien aplicados, crecer es <em>agregar</em> clases, no editar las que ya funcionan. A eso se le llama principio abierto/cerrado: abierto para extender, cerrado para modificar. Intenta el reto por tu cuenta antes de abrir la solución.',
+      pasos: ['Crea <code>js/5-reto.js</code> (copia del paso 4), cambia el <code>src</code> y agrega la opción <code>Postre</code> al select.', 'Crea <code>Postre</code>: hereda de <code>Plato</code>, con <code>porcion</code> («Individual» o «Para compartir», que suma $6.000), ícono 🍰 y 5 minutos de preparación.', 'Regístralo en <code>ETIQUETAS</code>, <code>OPCIONES</code> y <code>fabricas</code>. Por eso dejamos una coma al final de cada línea: agregar una no obliga a editar la anterior.', 'Abre la solución y compara: solo hay líneas verdes, y ninguna dentro de <code>dibujar()</code>, <code>dibujarOrdenes()</code> ni <code>total()</code>.'],
+      checks: ['Mi postre aparece en el menú y se puede pedir en una orden', 'No modifiqué <code>dibujar()</code>, <code>dibujarOrdenes()</code> ni <code>total()</code>'],
+      pensar: ['Reto extra: ¿cómo agregarías un combo (hamburguesa + bebida con 10 % de descuento)?', 'Crea <code>Combo extends Plato</code> que guarde una lista de platos (composición) y cuyo <code>calcularPrecio()</code> sume los <code>calcularPrecio()</code> de sus partes y multiplique por 0,9. Para la orden, un combo es un plato más: <code>total()</code> sigue igual. Ese diseño se llama patrón <em>Composite</em>.'],
+      solucion: true,
+      pruebas: [
+        { label: 'Postre Brownie $9.000 · Para compartir (esperado $15.000)', form: { tipo: 'Postre', nombre: 'Brownie', precio: 9000, extra: 'Para compartir' } },
+        { label: 'Abrir orden para la mesa 2', ui: function (u) { u.set('mesa', 2); u.submit('form-orden'); } },
+        { label: 'Pedir Brownie + Clásica (esperado $37.000)', ui: function (u, ns) { u.click('.pedir', -1); u.click('.pedir', 0); return 'orden.total() → ' + pesosG(ns.restaurante.ordenes.slice(-1)[0].total()); } },
+        { label: 'new Postre("Flan", 7000, "Individual").calcularPrecio()', src: 'new Postre("Flan", 7000, "Individual").calcularPrecio()', js: function (ns) { return new ns.Postre('Flan', 7000, 'Individual').calcularPrecio(); } }
+      ]
+    }
+  ];
+
+  /* ---------- GitHub: un commit (o dos) por fase, con su tipo ---------- */
+  var ADD = function (k) { return 'index.html js/' + FILES[k]; };
+  var GIT = [
+    { nota: 'Aquí haces <b>dos commits</b> porque son dos cambios de distinto tipo: los estilos (<code>style</code>) y la estructura con su primer JavaScript (<code>feat</code>). Con <code>git add</code> eliges qué archivos entran en cada uno.',
+      commits: [{ add: 'css/estilos.css', msg: 'style: paleta de colores y animaciones' }, { add: ADD(0), msg: 'feat: estructura base del menu y formulario' }] },
+    { nota: 'El <b>alcance</b> <code>(menu)</code> dice en qué parte del proyecto ocurrió el cambio. Antes de guardar, mira qué cambió con <code>git diff</code>: muestra en verde las líneas nuevas, igual que esta guía (pulsa <code>q</code> para salir).',
+      commits: [{ add: ADD(1), msg: 'feat(menu): crear y listar platos (abstraccion)' }] },
+    { nota: 'El paso 1 dejó un <b>bug</b>: se aceptaban precios negativos. Corregirlo es un <code>fix</code> (no existe <code>bug:</code>). Como el CRUD de edición es otra cosa, va en otro commit con <code>feat</code>. Dos cambios lógicos, dos commits.',
+      commits: [{ cuando: 'Después del punto 2 de «Haz esto» (ya existe #precio)', add: ADD(2), msg: 'fix(precio): rechazar precios negativos o en cero' }, { cuando: 'Al terminar el paso', add: ADD(2), msg: 'feat(menu): editar y eliminar platos con Menu' }] },
+    { nota: 'Cambiar el <code>if / else</code> por <code>fabricas</code>, solo, sería un <code>refactor</code> (mismo comportamiento, mejor código). Como aquí va junto a una funcionalidad nueva, el tipo principal es <code>feat</code>. Si quieres practicar, hazlo en dos commits.',
+      commits: [{ add: ADD(3), msg: 'feat(menu): datos propios por tipo (herencia)' }] },
+    { nota: 'Un alcance nuevo: <code>(ordenes)</code>. Fíjate en el mensaje: dentro de un mes entenderás qué hizo este commit solo con leer su título.',
+      commits: [{ add: ADD(4), msg: 'feat(ordenes): tablero de comandas (polimorfismo)' }] },
+    { nota: 'Cierra la fase de código. Antes de guardar, compara con <code>git diff --no-index js/4-polimorfismo.js js/5-reto.js</code>: si aplicaste bien los pilares, solo hay líneas verdes (agregadas) y ninguna roja.',
+      commits: [{ add: ADD(5), msg: 'feat(menu): agregar Postre sin tocar el total' }] }
+  ];
+
+  var SETUP = {
+    kind: 'info', nav: 'Antes de empezar', circ: 'G', tag: 'GitHub', num: 'Antes de empezar · 1',
+    titulo: 'Crea tu repositorio en GitHub',
+    logro: 'Una cuenta de GitHub, Git instalado y configurado, y un repositorio <code>comanda-ya</code> creado en la nube y clonado en tu computador, con las carpetas <code>css</code> y <code>js</code> listas para recibir un commit por cada paso de la guía.',
+    concepto: '<b>Git guarda la historia; GitHub la publica.</b> <code>Git</code> es el programa que corre en tu computador y toma «fotos» (commits) de tu proyecto. <code>GitHub</code> es el sitio donde guardas una copia en la nube, la compartes con tu instructor y construyes tu portafolio. Tu rutina será: escribir código → <code>commit</code> (guardar la foto con un buen nombre) → <code>push</code> (subirla).',
+    req: [
+      '<b>Cuenta en GitHub</b> (gratis) en <code>github.com</code>. Usa un correo que revises y verifícalo cuando GitHub te escriba.',
+      '<b>Git instalado.</b> Descárgalo de <code>git-scm.com</code> (en Windows, «Git for Windows» con las opciones por defecto). Comprueba con <code>git --version</code>.',
+      '<b>Visual Studio Code</b> (recomendado con la extensión <em>Live Server</em>) y un navegador.',
+      '<b>Una terminal.</b> En VS Code: menú <b>Terminal → Nuevo terminal</b>. En Windows también sirve «Git Bash», que se instala con Git.',
+      '<b>Cómo te reconoce GitHub al hacer push.</b> GitHub no acepta la contraseña de tu cuenta en la terminal. En Windows y macOS, la primera vez que hagas <code>git push</code> se abre el navegador para iniciar sesión. Si te pide una contraseña, usa un <em>token de acceso personal</em> (GitHub → Settings → Developer settings → Personal access tokens).'
+    ],
+    pasos: [
+      'Abre una terminal y dile a Git quién eres (una sola vez por computador). Usa el mismo correo de tu cuenta de GitHub.',
+      'En <code>github.com</code>, pulsa <b>+</b> (arriba a la derecha) → <b>New repository</b>.',
+      'Completa: nombre <code>comanda-ya</code>, una descripción corta («Sistema de comandas de un restaurante con POO en JavaScript»), visibilidad <b>Public</b> (o Private si tu instructor lo prefiere) y marca <b>Add a README file</b>. Pulsa <b>Create repository</b>.',
+      'Copia la dirección del repositorio: botón verde <b>Code</b> → pestaña <b>HTTPS</b>.',
+      'En la terminal, ve a la carpeta donde guardas tus trabajos, clona el repositorio (cambia <code>TU_USUARIO</code>) y crea dentro las carpetas <code>css</code> y <code>js</code>.',
+      'Verifica: <code>git status</code> debe decir que no hay nada por guardar y <code>git log --oneline</code> debe mostrar el commit inicial creado por GitHub. Abre la carpeta en VS Code con <code>code .</code>.'
+    ],
+    nota: 'Git no guarda carpetas vacías: <code>css</code> y <code>js</code> aparecerán en GitHub cuando tengan archivos, en el paso 0. Los comandos de Git siempre se ejecutan con la terminal ubicada dentro de <code>comanda-ya</code>.',
+    cmds: [
+      { cap: 'Terminal · paso 1 · identidad (una sola vez)', text: 'git --version\ngit config --global user.name "Tu Nombre Apellido"\ngit config --global user.email "tu-correo@ejemplo.com"\ngit config --global init.defaultBranch main' },
+      { cap: 'Terminal · pasos 5 y 6 · clonar, crear carpetas y verificar', text: '# Ve a la carpeta donde guardas tus trabajos, por ejemplo: cd Documents\ngit clone https://github.com/TU_USUARIO/comanda-ya.git\ncd comanda-ya\nmkdir css js\ngit status\ngit log --oneline\ncode .' }
+    ],
+    extra: '<h3>Cómo guardarás cada fase</h3><ol class="todo"><li>Escribe y prueba el código del paso.</li><li><code>git status</code> y <code>git diff</code>: revisa qué cambió.</li><li><code>git add</code> + <code>git commit -m "tipo(alcance): descripcion"</code>: guarda la foto con un nombre claro.</li><li><code>git push</code>: súbela a GitHub y recarga el repositorio para verla.</li></ol><p class="note">El siguiente apartado, <b>«Cómo nombrar tus commits»</b>, te enseña los tipos <code>feat</code>, <code>fix</code>, <code>style</code>, <code>docs</code> y los demás. Cada paso de la guía te dirá cuál usar y por qué.</p>',
+    checks: [
+      'Tengo cuenta en GitHub y <code>git --version</code> responde en mi terminal',
+      'Configuré mi nombre y correo con <code>git config</code>',
+      'Mi repositorio <code>comanda-ya</code> existe en GitHub y está clonado en mi computador'
+    ],
+    pensar: ['¿Cuál es la diferencia entre <code>git commit</code> y <code>git push</code>?', '<code>commit</code> guarda la foto solo en tu computador; <code>push</code> la sube a GitHub. Podrías acumular varios commits y subirlos juntos, pero en esta guía haces push en cada fase para que tu instructor vea tu avance y tengas una copia segura en la nube.']
+  };
+
+  var COMMITS = {
+    kind: 'info', nav: 'Nombrar commits', circ: 'C', tag: 'Commits', num: 'Antes de empezar · 2',
+    titulo: 'Cómo nombrar tus commits',
+    logro: 'Saber qué tipo ponerle a cada commit (<code>feat</code>, <code>fix</code>, <code>style</code>, <code>docs</code>, <code>refactor</code>...) y escribir títulos que cualquiera entienda, para que tu historial cuente cómo construiste el proyecto.',
+    concepto: '<b>Un commit es una foto con un título, y el título es para personas.</b> Quien lea tu historial (tu instructor, un compañero, tú mismo dentro de un mes) debe entender qué pasó sin abrir el código. Por eso se usa una convención: el <em>tipo</em> dice qué clase de cambio es y la descripción dice qué hiciste.',
+    pasos: [
+      'Lee la forma del mensaje y la tabla de categorías.',
+      'Fíjate en la diferencia entre <code>feat</code> (algo nuevo) y <code>fix</code> (corregir un bug), y entre <code>style</code> (cómo se ve) y <code>refactor</code> (cómo está organizado el código).',
+      'Resuelve el ejercicio de clasificación: elige el tipo correcto para cada cambio de ComandaYa.',
+      'Vuelve aquí cuando dudes: cada paso tiene un enlace a este apartado junto a sus comandos de Git.'
+    ],
+    cmds: [],
+    extra: COMMITS_HTML,
+    bind: bindQuiz,
+    checks: [
+      'Sé qué tipo usar para una funcionalidad nueva, para un bug y para un cambio de estilos',
+      'Acerté el ejercicio de clasificación',
+      'Mis títulos van en minúsculas, en infinitivo, sin punto final y con unos 50 caracteres como máximo'
+    ],
+    pensar: ['Si en un mismo commit agregas el botón «Cancelar orden» y corriges un error del total, ¿qué tipo le pones?', 'Lo mejor es no mezclarlos: haz dos commits, uno <code>feat(ordenes): cancelar una orden</code> y otro <code>fix(ordenes): corregir la suma del total</code>. Si ya los mezclaste, usa el tipo del cambio más importante y menciona el otro en el cuerpo del mensaje.']
+  };
+
+  var CIERRE = {
+    kind: 'info', nav: 'Cierre', circ: 'R', tag: 'README', num: 'Cierre del proyecto',
+    titulo: 'Documenta y publica tu proyecto',
+    logro: 'Un README con el diagrama de clases, un historial con commits bien nombrados y una versión final marcada, listo para entregar el enlace a tu instructor.',
+    concepto: '<b>El README es la portada de tu repositorio.</b> GitHub lo muestra debajo de la lista de archivos. Quien llegue a tu proyecto lo lee primero: qué hace, con qué se hizo y cómo ejecutarlo. Está escrito en <em>Markdown</em>, y GitHub dibuja automáticamente el bloque <code>```mermaid</code> como un diagrama de clases.',
+    pasos: [
+      'Abre <code>README.md</code> en VS Code y reemplaza todo su contenido por la plantilla de abajo. Cambia <code>TU_USUARIO</code>, tu nombre y el número de tu ficha.',
+      'Opcional: toma una captura de la app funcionando, guárdala como <code>docs/captura.png</code> y agrega bajo el título <code>![Captura de ComandaYa](docs/captura.png)</code>. Si lo haces, usa <code>git add README.md docs</code>.',
+      'Guarda el cambio con un commit de tipo <code>docs</code> y súbelo.',
+      'Revisa tu historial con <code>git log --oneline</code>: deben verse los tipos <code>style</code>, <code>feat</code>, <code>fix</code> y <code>docs</code>. Recarga GitHub: el README aparece con el diagrama dibujado.',
+      'Marca la versión final con una etiqueta (<em>tag</em>) y súbela. Aparecerá en la sección <b>Tags</b> de GitHub.',
+      'Opcional: publica la página con GitHub Pages en <b>Settings → Pages</b> → <b>Deploy from a branch</b> → rama <code>main</code>, carpeta <code>/ (root)</code> → <b>Save</b>. En un par de minutos quedará en <code>https://TU_USUARIO.github.io/comanda-ya/</code>.'
+    ],
+    nota: 'GitHub Pages en cuentas gratuitas requiere repositorio público. Entrega a tu instructor el enlace de tu repositorio.',
+    cmds: [
+      { cap: 'README.md · plantilla para reemplazar el contenido', text: txt('readme') },
+      { cap: 'Terminal · pasos 3 y 4 · commit del README y revisión del historial', text: 'git add README.md\ngit commit -m "docs: agregar README con diagrama de clases"\ngit push\ngit log --oneline' },
+      { cap: 'Terminal · paso 5 · versión final', text: 'git tag -a v1.0 -m "ComandaYa completo con los cuatro pilares de POO"\ngit push origin v1.0' }
+    ],
+    extra: '<h3>Qué debe mostrar tu historial</h3><p class="note">Con <code>git log --oneline</code> verás los más recientes arriba (cada uno con un código distinto al inicio):</p><div class="codewrap"><pre><code>' +
+      ['docs: agregar README con diagrama de clases', 'feat(menu): agregar Postre sin tocar el total', 'feat(ordenes): tablero de comandas (polimorfismo)', 'feat(menu): datos propios por tipo (herencia)', 'feat(menu): editar y eliminar platos con Menu', 'fix(precio): rechazar precios negativos o en cero', 'feat(menu): crear y listar platos (abstraccion)', 'feat: estructura base del menu y formulario', 'style: paleta de colores y animaciones', 'Initial commit'].map(function (m, k) { return '<span class="l">' + ('a1b2c3' + k).slice(-7) + ' ' + esc(m) + '</span>'; }).join('') + '</code></pre></div>',
+    checks: [
+      'La portada de mi repositorio muestra el README con el diagrama de clases dibujado',
+      'Mi historial tiene un commit por fase, con su tipo bien elegido',
+      'Subí la etiqueta <code>v1.0</code> y tengo el enlace del repositorio para entregar'
+    ],
+    pensar: ['¿Por qué es mejor un commit por cambio lógico que uno solo al final?', 'Cada commit es un punto al que puedes volver y deja constancia de cómo construiste el proyecto. Si algo se rompe, <code>git log</code> te dice en qué fase pasó, y el tipo (<code>fix</code>, <code>feat</code>...) te ayuda a encontrarlo rápido. Tu instructor ve tu proceso, no solo el resultado.']
+  };
+
+  STEPS.forEach(function (s, k) {
+    s.ci = k; s.git = GIT[k]; s.circ = String(k); s.nav = k === 0 ? 'Punto de partida' : 'Paso ' + k;
+    s.checks.push('Guardé este avance con commits bien nombrados y los veo en GitHub');
+  });
+  STEPS.unshift(SETUP, COMMITS);
+  STEPS.push(CIERRE);
+  var COMMITS_INDEX = 1;
+
+  /* ---------- estado ---------- */
+  var KEY = 'guia-comandaya-v1', S = { checks: {} }, cur = 0;
+  try { var raw = localStorage.getItem(KEY); if (raw) S.checks = JSON.parse(raw).checks || {}; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function stepDone(i) { return STEPS[i].checks.every(function (c, k) { return S.checks[i + '-' + k]; }); }
+
+  var nav = $('#nav'), main = $('#main');
+  function drawNav() {
+    nav.innerHTML = STEPS.map(function (s, i) {
+      var d = stepDone(i);
+      return '<button class="navitem' + (d ? ' done' : '') + '" data-i="' + i + '"' + (i === cur ? ' aria-current="true"' : '') + '><span class="n">' + (d ? '✓' : s.circ) + '</span><span class="nt">' + s.nav + '<small>' + s.tag + '</small></span></button>';
+    }).join('');
+    $$('.navitem', nav).forEach(function (b) { b.onclick = function () { open(Number(b.dataset.i)); window.scrollTo(0, 0); }; });
+    var n = STEPS.filter(function (s, i) { return stepDone(i); }).length;
+    $('#prog-txt').textContent = n + ' de ' + STEPS.length + ' pasos';
+    $('#prog-bar').style.width = (n / STEPS.length * 100) + '%';
+  }
+
+  function copyText(text, btn) {
+    var done = function (ok) { var old = btn.dataset.l || btn.textContent; btn.dataset.l = old; btn.textContent = ok ? '¡Copiado!' : 'Selecciona y copia manualmente'; setTimeout(function () { btn.textContent = old; }, 1800); };
+    var fallback = function () {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(ok);
+    };
+    try { navigator.clipboard.writeText(text).then(function () { done(true); }, fallback); } catch (e) { fallback(); }
+  }
+
+  function cmdBlock(cap, text, k) {
+    return '<div class="inner"><div class="codewrap"><div class="cap">' + cap + '</div><pre><code>' + text.split('\n').map(function (t) {
+      return '<span class="l">' + (esc(t) || ' ') + '</span>';
+    }).join('') + '</code></pre></div><div class="row"><button class="act" data-cmd="' + k + '">Copiar</button></div></div>';
+  }
+  function bindCmds(texts) {
+    $$('[data-cmd]', main).forEach(function (b) { b.onclick = function () { copyText(texts[b.dataset.cmd], b); }; });
+  }
+  function checksHtml(i, st) {
+    return '<div class="card"><h3>Punto de control</h3><ul class="checks">' + st.checks.map(function (c, k) {
+      return '<li><label><input type="checkbox" data-c="' + k + '"' + (S.checks[i + '-' + k] ? ' checked' : '') + '><span>' + c + '</span></label></li>';
+    }).join('') + '</ul></div>' +
+      '<details class="think"><summary>Para pensar: ' + st.pensar[0] + '</summary><p>' + st.pensar[1] + '</p></details>' +
+      '<div class="navbtns">' + (i > 0 ? '<button class="act" data-prev>← Paso anterior</button>' : '<span></span>') + (i < STEPS.length - 1 ? '<button class="act primary" data-next>Siguiente paso →</button>' : '<span></span>') + '</div>';
+  }
+  function bindCommon(i) {
+    $$('[data-c]', main).forEach(function (cb) {
+      cb.onchange = function () { S.checks[i + '-' + cb.dataset.c] = cb.checked; save(); drawState(); drawNav(); };
+    });
+    function drawState() { var s = $('[data-state]', main), d = stepDone(i); s.textContent = d ? '✓ Completado' : 'Pendiente'; s.className = 'state' + (d ? ' ok' : ''); }
+    drawState();
+    var pb = $('[data-prev]', main), nb = $('[data-next]', main);
+    if (pb) pb.onclick = function () { open(i - 1); window.scrollTo(0, 0); };
+    if (nb) nb.onclick = function () { open(i + 1); window.scrollTo(0, 0); };
+    $$('[data-goto-commits]', main).forEach(function (b) { b.onclick = function () { open(COMMITS_INDEX); window.scrollTo(0, 0); }; });
+  }
+
+  function openInfo(i, st) {
+    var texts = {};
+    var cmdHtml = st.cmds.map(function (c, k) { texts[k] = c.text; return cmdBlock(c.cap, c.text, k); }).join('');
+    main.innerHTML =
+      '<article class="step">' +
+        '<div class="exhead"><span class="num">' + st.num + '</span><span class="tag">' + st.tag + '</span><span class="state" data-state></span></div>' +
+        '<h2>' + st.titulo + '</h2>' +
+        '<div class="card"><h3>Qué vas a lograr</h3><p>' + st.logro + '</p></div>' +
+        '<div class="card concept"><p>' + st.concepto + '</p></div>' +
+        (st.req ? '<div class="card"><h3>Qué necesitas antes</h3><ul class="req">' + st.req.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul></div>' : '') +
+        '<div class="card"><h3>Haz esto</h3><ol class="todo">' + st.pasos.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ol>' + (st.nota ? '<p class="note">' + st.nota + '</p>' : '') + '</div>' +
+        (st.cmds.length ? '<div class="inner"><h3>Comandos y archivos</h3>' + cmdHtml + '</div>' : '') +
+        (st.extra ? '<div class="card">' + st.extra + '</div>' : '') +
+        checksHtml(i, st) +
+      '</article>';
+    bindCmds(texts);
+    if (st.bind) st.bind(main);
+    bindCommon(i);
+  }
+
+  function gitCard(ci, g) {
+    var texts = {};
+    var body = g.commits.map(function (c, k) {
+      var tipo = c.msg.split(/[(:!]/)[0];
+      texts['g' + k] = (c.cuando ? '# ' + c.cuando + '\n' : '') + 'git status\n' + (ci > 0 ? 'git diff\n' : '') + 'git add ' + c.add + '\ngit commit -m "' + c.msg + '"\ngit push';
+      return '<div class="commitrow">' + chip(tipo) + '<span class="note">' + TIPO_CORTO[tipo] + '</span></div>' +
+        cmdBlock('Terminal · commit ' + (k + 1) + ' de ' + g.commits.length + ' · dentro de comanda-ya', texts['g' + k], 'g' + k);
+    }).join('');
+    return {
+      texts: texts,
+      html: '<div class="card gitcard"><h3>Guarda este avance en GitHub</h3><p>' + g.nota + '</p>' + body +
+        '<p class="note">Recarga tu repositorio en GitHub: arriba de la lista de archivos debe aparecer tu último commit.</p>' +
+        '<div class="row"><button class="act" data-goto-commits>¿Dudas con el tipo? Ver «Cómo nombrar tus commits»</button></div></div>'
+    };
+  }
+
+  function open(i) {
+    cur = i; drawNav();
+    var st = STEPS[i];
+    if (st.kind === 'info') { openInfo(i, st); return; }
+    var ci = st.ci, T = tabsHtml(ci), gc = gitCard(ci, st.git);
+    var codeSection = st.solucion
+      ? '<details class="fold" data-sol><summary>Ver la solución del reto (inténtalo primero)</summary><div class="inner">' + T.html + '</div></details>'
+      : T.html;
+    var umlHtml = UML[ci].cls.length
+      ? '<div class="umlwrap">' + umlSvg(ci) + '</div>' +
+        '<div class="umllegend"><span><i>Cursiva</i> = abstracta</span><span><code>-</code> privado (<code>#</code>) · <code>+</code> público</span><span>△ hereda de</span><span>◆ compone</span><span>◇ agrega</span><span class="lgnew">verde = nuevo en este paso</span></div>' +
+        '<div class="umlinfo" data-umlinfo><p class="note">Pulsa una clase del diagrama para ver qué hace y dónde está en el código.</p></div>'
+      : '<p class="note">Todavía no hay clases: en este paso solo conectas los archivos. En el paso 1 nace <code>Plato</code>, la primera clase abstracta.</p>';
+    main.innerHTML =
+      '<article class="step">' +
+        '<div class="exhead"><span class="num">' + (ci === 0 ? 'Punto de partida' : 'Paso ' + ci + ' de 5') + '</span><span class="tag">' + st.tag + '</span><span class="state" data-state></span></div>' +
+        '<h2>' + st.titulo + '</h2>' +
+        '<div class="card"><h3>Qué vas a lograr</h3><p>' + st.logro + '</p></div>' +
+        '<div class="card concept"><p>' + st.concepto + '</p></div>' +
+        '<div class="card"><h3>Diagrama de clases de este paso</h3>' + umlHtml + '</div>' +
+        '<div class="card"><h3>Haz esto</h3><ol class="todo">' + st.pasos.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ol>' + (st.nota ? '<p class="note">' + st.nota + '</p>' : '') + '</div>' +
+        '<div class="inner">' +
+          '<div class="codehead"><h3>Código de este paso</h3>' + (ci > 0 && !st.solucion ? '<span class="legend"><i></i> línea nueva o modificada</span>' : '') + '<button class="act primary" data-copy>Copiar archivo de la pestaña</button></div>' +
+          codeSection +
+        '</div>' +
+        '<div class="inner"><h3>Pruébalo</h3><div class="preview">' +
+          '<div class="pv"><div class="bar2"><i></i><i></i><i></i> index.html con js/' + FILES[ci] + '</div><div class="host" data-host></div></div>' +
+          '<div class="inner"><div class="row" data-tests></div><div class="log" data-log></div></div>' +
+        '</div></div>' + gc.html +
+        checksHtml(i, st) +
+      '</article>';
+
+    /* pestañas */
+    var active = T.def;
+    function setTab(k) {
+      active = k;
+      $$('.tab', main).forEach(function (b) { b.setAttribute('aria-selected', String(Number(b.dataset.tab) === k)); });
+      $$('.tabpanel', main).forEach(function (p) { p.hidden = Number(p.dataset.panel) !== k; });
+    }
+    $$('.tab', main).forEach(function (b) { b.onclick = function () { setTab(Number(b.dataset.tab)); }; });
+    $('[data-copy]', main).onclick = function () { copyText(T.files[active].text, this); };
+
+    /* diagrama interactivo */
+    var svg = $('svg.uml', main);
+    if (svg) {
+      var pick = function (g) {
+        $$('g.cls', svg).forEach(function (x) { x.classList.toggle('sel', x === g); });
+        var info = $('[data-umlinfo]', main); info.innerHTML = umlInfo(ci, g.dataset.cls);
+        $('[data-goto]', info).onclick = function () {
+          var sol = $('[data-sol]', main); if (sol) sol.open = true;
+          setTab(2);
+          var re = new RegExp('^class ' + g.dataset.cls + '\\b');
+          $$('.tabpanel[data-panel="2"] .l', main).forEach(function (l) { l.classList.remove('hit'); });
+          var line = $$('.tabpanel[data-panel="2"] .l', main).filter(function (l) { return re.test(l.textContent); })[0];
+          if (line) { line.classList.add('hit'); line.scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { line.classList.remove('hit'); }, 2600); }
+        };
+      };
+      $$('g.cls', svg).forEach(function (g) {
+        g.addEventListener('click', function () { pick(g); });
+        g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(g); } });
+      });
+    }
+
+    /* vista previa y pruebas */
+    var log = new Log($('[data-log]', main)), pv;
+    function reset() { log.clear(); pv = mount($('[data-host]', main), ci, log); }
+    reset();
+    var tests = $('[data-tests]', main);
+    st.pruebas.forEach(function (t) {
+      var b = document.createElement('button'); b.className = 'act mono'; b.textContent = t.label;
+      b.onclick = function () { runTest(t, pv, log); };
+      tests.appendChild(b);
+    });
+    var rb = document.createElement('button'); rb.className = 'act'; rb.textContent = 'Reiniciar vista previa'; rb.onclick = reset; tests.appendChild(rb);
+
+    bindCmds(gc.texts);
+    bindCommon(i);
+  }
+
+  var start = 0;
+  for (var z = 0; z < STEPS.length; z++) { if (!stepDone(z)) { start = z; break; } }
+  open(start);
+})();
+</script>
+
+</body></html>
